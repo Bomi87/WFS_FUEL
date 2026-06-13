@@ -6,263 +6,267 @@
 
   <title>World Fuel Price</title>
 
+<style>
+  * {
+    box-sizing: border-box;
+  }
 
-  <style>
-    * {
-      box-sizing: border-box;
+  body {
+    margin: 0;
+    font-family: Arial, "Noto Sans KR", sans-serif;
+    color: #e9eef5;
+    background:
+      radial-gradient(circle at 80% 10%, rgba(180, 190, 230, 0.35), transparent 28%),
+      linear-gradient(135deg, #505762 0%, #666a78 42%, #4e5365 100%);
+    min-height: 100vh;
+  }
+
+  .page {
+    width: 100%;
+    padding: 18px;
+  }
+
+  .divider {
+    height: 1px;
+    background: rgba(255,255,255,0.2);
+    margin: 18px 0 28px;
+  }
+
+  .input-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+    align-items: center;
+  }
+
+  input,
+  button {
+    height: 40px;
+    font-size: 15px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+  }
+
+  input {
+    width: 300px;
+    padding: 0 12px;
+    text-transform: uppercase;
+    background: rgba(255,255,255,0.93);
+    color: #111;
+  }
+
+  button {
+    padding: 0 26px;
+    background: #111926;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  }
+
+  button:hover {
+    background: #1a2638;
+  }
+
+  button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .search-area {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .search-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-right: 4px;
+  }
+
+  .pill {
+    background: #172335;
+    border-radius: 999px;
+    padding: 8px 22px;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    min-width: 78px;
+    text-align: center;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+  }
+
+  .status {
+    margin-top: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #dce5f0;
+    min-height: 20px;
+  }
+
+  .success {
+    color: #d7ffe2;
+    font-weight: 700;
+  }
+
+  .error {
+    color: #ffb0b0;
+    font-weight: 700;
+  }
+
+  .airport-section {
+    margin-bottom: 34px;
+  }
+
+  .airport-title {
+    font-size: 18px;
+    font-weight: 800;
+    margin: 0 0 14px;
+    color: #ffffff;
+    letter-spacing: 0.3px;
+  }
+
+  .fbo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(360px, 760px));
+    gap: 26px;
+    justify-content: start;
+  }
+
+  .fbo-card {
+    min-width: 0;
+    max-width: 760px;
+  }
+
+  .fbo-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  .fuel-table {
+    width: 100%;
+    max-width: 760px;
+    border-collapse: collapse;
+    background: #1d2838;
+    color: #dfe8f4;
+    font-size: 13px;
+    overflow: hidden;
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.08);
+  }
+
+  .fuel-table thead tr:first-child th {
+    background: #223244;
+    color: #ffffff;
+    text-align: left;
+    padding: 9px 12px;
+    font-size: 12px;
+    font-weight: 800;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+  }
+
+  .fuel-table thead tr:nth-child(2) th {
+    background: #1d2838;
+    color: #bfc9d9;
+    padding: 12px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .fuel-table thead tr:nth-child(2) th:first-child,
+  .fuel-table tbody td:first-child {
+    text-align: left;
+    padding-left: 14px;
+  }
+
+  .fuel-table thead tr:nth-child(2) th:nth-child(2),
+  .fuel-table tbody td:nth-child(2) {
+    text-align: center;
+  }
+
+  .fuel-table td {
+    padding: 15px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-weight: 700;
+    color: #dce6f2;
+  }
+
+  .fuel-table tbody tr:hover {
+    background: rgba(255,255,255,0.035);
+  }
+
+  .empty-box {
+    background: rgba(17, 25, 38, 0.65);
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    color: #c5ceda;
+    font-weight: 700;
+  }
+
+  .footer-note {
+    margin-top: 12px;
+    color: #c4ccd8;
+    font-size: 12px;
+  }
+
+  @media (max-width: 900px) {
+    .fbo-grid {
+      grid-template-columns: 1fr;
     }
 
-    body {
-      margin: 0;
-      font-family: Arial, "Noto Sans KR", sans-serif;
-      color: #e9eef5;
-      background:
-        radial-gradient(circle at 80% 10%, rgba(180, 190, 230, 0.35), transparent 28%),
-        linear-gradient(135deg, #505762 0%, #666a78 42%, #4e5365 100%);
-      min-height: 100vh;
+    .quote-card {
+      min-width: calc(50% - 8px);
     }
+  }
 
+  @media (max-width: 600px) {
     .page {
-      width: 100%;
-      padding: 18px;
+      padding: 12px;
     }
 
-   
-
-    .divider {
-      height: 1px;
-      background: rgba(255,255,255,0.2);
-      margin: 18px 0 28px;
+    .quote-card {
+      min-width: 100%;
     }
 
     .input-panel {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 14px;
-      align-items: center;
+      display: grid;
+      grid-template-columns: 1fr;
     }
 
     input,
     button {
-      height: 40px;
-      font-size: 15px;
-      border-radius: 6px;
-      border: none;
-      outline: none;
-    }
-
-    input {
-      width: 300px;
-      padding: 0 12px;
-      text-transform: uppercase;
-      background: rgba(255,255,255,0.93);
-      color: #111;
-    }
-
-    button {
-      padding: 0 26px;
-      background: #111926;
-      color: #fff;
-      cursor: pointer;
-      font-weight: 700;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-    }
-
-    button:hover {
-      background: #1a2638;
-    }
-
-    button:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
+      width: 100%;
     }
 
     .search-area {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-
-    .search-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: #ffffff;
-      margin-right: 4px;
+      gap: 7px;
     }
 
     .pill {
-      background: #172335;
-      border-radius: 999px;
-      padding: 8px 22px;
-      color: #ffffff;
-      font-size: 13px;
-      font-weight: 700;
-      min-width: 78px;
-      text-align: center;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
-    }
-
-    .status {
-      margin-top: 8px;
-      margin-bottom: 20px;
-      font-size: 14px;
-      color: #dce5f0;
-      min-height: 20px;
-    }
-
-    .success {
-      color: #d7ffe2;
-      font-weight: 700;
-    }
-
-    .error {
-      color: #ffb0b0;
-      font-weight: 700;
-    }
-
-    .airport-section {
-      margin-bottom: 34px;
-    }
-
-    .airport-title {
-      font-size: 18px;
-      font-weight: 800;
-      margin: 0 0 14px;
-      color: #ffffff;
-      letter-spacing: 0.3px;
-    }
-
-    .fbo-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 26px;
-    }
-
-    .fbo-card {
-      min-width: 0;
-    }
-
-    .fbo-title {
-      font-size: 14px;
-      font-weight: 800;
-      color: #ffffff;
-      margin-bottom: 8px;
-      text-transform: uppercase;
+      padding: 7px 14px;
     }
 
     .fuel-table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #1d2838;
-      color: #dfe8f4;
-      font-size: 13px;
-      overflow: hidden;
-      border-radius: 4px;
-      box-shadow: 0 0 0 1px rgba(255,255,255,0.08);
-    }
-
-    .fuel-table thead tr:first-child th {
-      background: #223244;
-      color: #ffffff;
-      text-align: left;
-      padding: 9px 12px;
       font-size: 12px;
-      font-weight: 800;
-      border-bottom: 1px solid rgba(255,255,255,0.12);
-    }
-
-    .fuel-table thead tr:nth-child(2) th {
-      background: #1d2838;
-      color: #bfc9d9;
-      padding: 12px 8px;
-      font-size: 11px;
-      font-weight: 700;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
     }
 
     .fuel-table td {
-      padding: 15px 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      font-weight: 700;
-      color: #dce6f2;
+      padding: 12px 8px;
     }
+  }
+</style>
 
-    .fuel-table td:nth-child(1) {
-      text-align: left;
-    }
-
-    .fuel-table td:nth-child(2) {
-      text-align: center;
-    }
-
-    .fuel-table tbody tr:hover {
-      background: rgba(255,255,255,0.035);
-    }
-
-    .empty-box {
-      background: rgba(17, 25, 38, 0.65);
-      border-radius: 8px;
-      padding: 30px;
-      text-align: center;
-      color: #c5ceda;
-      font-weight: 700;
-    }
-
-    .footer-note {
-      margin-top: 12px;
-      color: #c4ccd8;
-      font-size: 12px;
-    }
-
-    @media (max-width: 900px) {
-      .fbo-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .quote-card {
-        min-width: calc(50% - 8px);
-      }
-    }
-
-    @media (max-width: 600px) {
-      .page {
-        padding: 12px;
-      }
-
-      .quote-card {
-        min-width: 100%;
-      }
-
-      .input-panel {
-        display: grid;
-        grid-template-columns: 1fr;
-      }
-
-      input,
-      button {
-        width: 100%;
-      }
-
-      .search-area {
-        gap: 7px;
-      }
-
-      .pill {
-        padding: 7px 14px;
-      }
-
-      .fuel-table {
-        font-size: 12px;
-      }
-
-      .fuel-table td {
-        padding: 12px 8px;
-      }
-    }
-  </style>
 
 
 
