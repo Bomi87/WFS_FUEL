@@ -766,8 +766,8 @@ function renderAirportSections(rows, icaoList) {
                 <div class="cost-summary">
                   <div>총 비용 USD: ${formatMoneyUsd(row.totalCostUsd)}</div>
                   <div>총 비용 KRW: ${formatMoneyKrw(row.totalCostKrw)}</div>
-                <small>
-  Fuel: ${formatNumber(row.fuelLbs)} lbs / ${formatNumber(row.fuelUsg)} USG
+     <small>
+  Fuel: ${formatCeilNumber(row.fuelLbs)} lbs / ${formatCeilNumber(row.fuelUsg)} USG
 </small>
                 </div>
               </td>
@@ -852,7 +852,13 @@ function renderAirportSections(rows, icaoList) {
         maximumFractionDigits: 0
       });
     }
-
+    
+function formatCeilNumber(value) {
+  if (value === null || value === undefined || value === "") return "";
+  const n = Number(value);
+  if (Number.isNaN(n)) return "";
+  return Math.ceil(n).toLocaleString("en-US");
+}
     function formatNumber(value) {
       if (value === null || value === undefined || value === "") return "";
       const n = Number(value);
