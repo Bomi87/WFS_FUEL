@@ -308,7 +308,22 @@
     font-size: 11px;
     font-weight: 700;
   }
+.fx-banner {
+  display: inline-block;
+  margin: 0 0 14px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  background: rgba(17, 25, 38, 0.72);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+}
 
+.fx-banner span {
+  color: #d3ddec;
+  font-weight: 700;
+}
   .empty-box {
     background: rgba(17, 25, 38, 0.65);
     border-radius: 8px;
@@ -637,11 +652,16 @@
       }
     }
 
-    function renderAirportSections(rows, icaoList) {
-      const resultArea = document.getElementById("resultArea");
-      const byIcao = groupBy(rows, r => r.icao || "");
+function renderAirportSections(rows, icaoList) {
+  const resultArea = document.getElementById("resultArea");
+  const byIcao = groupBy(rows, r => r.icao || "");
 
-      const sections = [];
+  const fxRow = rows.find(r => r.usdKrwRate);
+  const fxBanner = fxRow && fxRow.usdKrwRate
+    ? `<div class="fx-banner">USD/KRW 환율: <span>${formatNumber(fxRow.usdKrwRate)}</span></div>`
+    : "";
+
+  const sections = [];
 
       icaoList.forEach(icao => {
         const airportRows = byIcao[icao] || [];
@@ -672,7 +692,7 @@
         `);
       });
 
-      resultArea.innerHTML = sections.join("");
+  resultArea.innerHTML = fxBanner + sections.join("");
     }
 
     function renderFboCard(fbo, rows) {
@@ -690,10 +710,9 @@
                 <div class="cost-summary">
                   <div>총 비용 USD: ${formatMoneyUsd(row.totalCostUsd)}</div>
                   <div>총 비용 KRW: ${formatMoneyKrw(row.totalCostKrw)}</div>
-                  <small>
-                    Fuel: ${formatNumber(row.fuelLbs)} lbs / ${formatNumber(row.fuelUsg)} USG
-                    ${row.usdKrwRate ? " / 환율: " + formatNumber(row.usdKrwRate) : ""}
-                  </small>
+                <small>
+  Fuel: ${formatNumber(row.fuelLbs)} lbs / ${formatNumber(row.fuelUsg)} USG
+</small>
                 </div>
               </td>
             </tr>
