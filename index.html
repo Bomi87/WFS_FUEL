@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
   <title>World Fuel Price</title>
 
@@ -51,6 +51,17 @@
     outline: none;
   }
 
+  html {
+  -webkit-text-size-adjust: 100%;
+}
+
+input,
+textarea,
+select {
+  font-size: 16px !important;
+  line-height: 16px;
+  touch-action: manipulation;
+}
 input {
   padding: 0 12px;
   background: rgba(255,255,255,0.93);
@@ -365,6 +376,14 @@ input {
   }
 
 @media (max-width: 600px) {
+  #icaoInput,
+  #fuelLbsInput,
+  #fuelGallonInput {
+    font-size: 16px !important;
+    line-height: 16px;
+    transform: none;
+  }
+
   html,
   body {
     width: 100%;
