@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>World Fuel Price</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, "Noto Sans KR", sans-serif;
+      background: #f4f6f8;
+      color: #222;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header-card,
+    .result-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin: 0 0 6px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 16px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    input,
+    button {
+      height: 40px;
+      font-size: 16px;
+      padding: 0 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    input {
+      width: 260px;
+      text-transform: uppercase;
+    }
+
+    button {
+      background: #111;
+      color: #fff;
+      cursor: pointer;
+      border: none;
+      min-width: 110px;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    .error {
+      color: #c62828;
+      font-weight: bold;
+    }
+
+    .success {
+      color: #1b5e20;
+      font-weight: bold;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      font-size: 14px;
+      min-width: 620px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid #e5e5e5;
+      padding: 10px 8px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f1f3f5;
+      font-weight: bold;
+    }
+
+    td:nth-child(2),
+    th:nth-child(2) {
+      text-align: left;
+    }
+
+    .empty {
+      color: #777;
+      text-align: center;
+      padding: 18px;
+    }
+
+    .footer-note {
+      font-size: 12px;
+      color: #888;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 12px;
+      }
+
+      .header-card,
+      .result-card {
+        padding: 14px;
+        border-radius: 12px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      .input-row {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      input,
+      button {
+        width: 100%;
+        font-size: 16px;
+      }
+
+      table {
+        font-size: 12px;
+      }
+
+      th,
+      td {
+        padding: 8px 6px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header-card">
+      <h1>World Fuel Price</h1>
+      <div class="subtitle">
+        INTL / CORP 고정 · 여러 공항 조회 가능
+      </div>
+
+      <div class="input-row">
+        <input
+          id="icaoInput"
+          placeholder="ICAO 예: KSJC,KBFI,KEWR"
+          autocomplete="off"
+        />
+        <button id="searchBtn" onclick="searchFuelPrice()">조회</button>
+        <button id="clearBtn" onclick="clearResult()">초기화</button>
+      </div>
+
+      <div id="status" class="status">
+        ICAO를 입력하세요. 예: KSJC 또는 KSJC,KBFI,KEWR
+      </div>
+    </div>
+
+    <div class="result-card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ICAO</th>
+              <th>FBO</th>
+              <th>Scale From</th>
+              <th>Scale To</th>
+              <th>Total Price</th>
+            </tr>
+          </thead>
+          <tbody id="resultBody">
+            <tr>
+              <td colspan="5" class="empty">조회 결과 없음</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="footer-note">
+        Price 기준: World Fuel API Total Price / UOM: USG 기준
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /****************************************************
+     * 여기에 Apps Script Web App URL 입력
+     ****************************************************/
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxw04d7T-Dhu8VYHK9h41EQA0AQ4IeA_K79jgMQThj6xVS8sxTYI0LfR_LMx7Fy6NaZAA/exec";
+
+    async function searchFuelPrice() {
+      const inputEl = document.getElementById("icaoInput");
+      const statusEl = document.getElementById("status");
+      const tbody = document.getElementById("resultBody");
+      const searchBtn = document.getElementById("searchBtn");
+
+      const icaoRaw = inputEl.value.trim().toUpperCase().replace(/\s+/g, "");
+
+      const icaoList = icaoRaw
+        .split(",")
+        .map(x => x.trim().toUpperCase())
+        .filter(Boolean);
+
+      const invalidList = icaoList.filter(x => !/^[A-Z]{4}$/.test(x));
+
+      if (icaoList.length === 0) {
+        statusEl.innerHTML =
+          '<span class="error">ICAO를 입력하세요. 예: KSJC 또는 KSJC,KBFI,KEWR</span>';
+        return;
+      }
+
+      if (invalidList.length > 0) {
+        statusEl.innerHTML =
+          '<span class="error">ICAO 형식 오류: ' +
+          escapeHtml(invalidList.join(", ")) +
+          '</span>';
+        return;
+      }
+
+      if (!SCRIPT_URL || SCRIPT_URL === "여기에_APPS_SCRIPT_WEB_APP_URL") {
+        statusEl.innerHTML =
+          '<span class="error">SCRIPT_URL을 Apps Script Web App URL로 수정하세요.</span>';
+        return;
+      }
+
+      searchBtn.disabled = true;
+      statusEl.textContent = "조회 중...";
+      tbody.innerHTML = '<tr><td colspan="5" class="empty">Loading...</td></tr>';
+
+      const url =
+        SCRIPT_URL +
+        "?icao=" + encodeURIComponent(icaoList.join(","));
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!data.success && !data.partialSuccess) {
+          throw new Error(data.message || "조회 실패");
+        }
+
+        const rows = data.rows || [];
+
+        if (rows.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="5" class="empty">결과 없음</td></tr>';
+
+          statusEl.textContent =
+            `${icaoList.join(", ")} / 조회 결과 없음`;
+
+          return;
+        }
+
+        tbody.innerHTML = rows.map(row => `
+          <tr>
+            <td>${escapeHtml(row.icao || "")}</td>
+            <td>${escapeHtml(row.fbo || "")}</td>
+            <td>${escapeHtml(row.scaleFrom || "")}</td>
+            <td>${escapeHtml(row.scaleTo || "")}</td>
+            <td>${formatPrice(row.totalPrice)}</td>
+          </tr>
+        `).join("");
+
+        let statusText =
+          `${(data.icaoList || icaoList).join(", ")} / ${rows.length}개 가격 구간 조회 완료`;
+
+        if (data.generatedAtUtc) {
+          statusText += ` / ${formatUtc(data.generatedAtUtc)}`;
+        }
+
+        if (data.errors && data.errors.length > 0) {
+          statusEl.innerHTML =
+            '<span class="success">' + escapeHtml(statusText) + '</span>' +
+            '<br><span class="error">일부 공항 오류: ' +
+            escapeHtml(data.errors.map(e => e.icao + " - " + e.message).join(" / ")) +
+            '</span>';
+        } else {
+          statusEl.innerHTML =
+            '<span class="success">' + escapeHtml(statusText) + '</span>';
+        }
+
+      } catch (err) {
+        tbody.innerHTML =
+          '<tr><td colspan="5" class="empty">조회 실패</td></tr>';
+
+        statusEl.innerHTML =
+          '<span class="error">' + escapeHtml(err.message) + '</span>';
+
+      } finally {
+        searchBtn.disabled = false;
+      }
+    }
+
+    function clearResult() {
+      document.getElementById("icaoInput").value = "";
+      document.getElementById("status").textContent =
+        "ICAO를 입력하세요. 예: KSJC 또는 KSJC,KBFI,KEWR";
+
+      document.getElementById("resultBody").innerHTML =
+        '<tr><td colspan="5" class="empty">조회 결과 없음</td></tr>';
+    }
+
+    function formatPrice(value) {
+      if (value === null || value === undefined || value === "") return "";
+      const n = Number(value);
+      if (Number.isNaN(n)) return escapeHtml(value);
+      return n.toFixed(5);
+    }
+
+    function formatUtc(isoText) {
+      try {
+        const d = new Date(isoText);
+        if (Number.isNaN(d.getTime())) return isoText;
+
+        const yyyy = d.getUTCFullYear();
+        const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+        const dd = String(d.getUTCDate()).padStart(2, "0");
+        const hh = String(d.getUTCHours()).padStart(2, "0");
+        const mi = String(d.getUTCMinutes()).padStart(2, "0");
+
+        return `${yyyy}-${mm}-${dd} ${hh}:${mi}Z`;
+      } catch (e) {
+        return isoText;
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    document.getElementById("icaoInput").addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        searchFuelPrice();
+      }
+    });
+  </script>
+</body>
+</html>
