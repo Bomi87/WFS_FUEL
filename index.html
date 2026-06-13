@@ -66,6 +66,18 @@
     width: 130px;
     text-transform: none;
   }
+  .fuel-input-stack {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  width: 130px;
+}
+
+#fuelLbsInput,
+#fuelGallonInput {
+  width: 130px;
+  text-transform: none;
+}
 
   button {
     padding: 0 22px;
@@ -93,7 +105,7 @@
       "title airport"
       "intl corp";
     justify-content: start;
-    align-items: center;
+    align-items: start;
     gap: 10px 10px;
     margin-bottom: 24px;
   }
@@ -384,7 +396,13 @@
     font-size: 12px;
   }
 
-#fuelLbsInput {
+.fuel-input-stack {
+  width: 86px;
+  gap: 5px;
+}
+
+#fuelLbsInput,
+#fuelGallonInput {
   width: 86px;
   min-width: 0;
   height: 34px;
@@ -508,12 +526,23 @@
 
       <button id="searchBtn" onclick="searchFuelPrice()">조회</button>
 
-      <input
-        id="fuelLbsInput"
-        placeholder="Fuel lbs"
-        inputmode="numeric"
-        autocomplete="off"
-      />
+<div class="fuel-input-stack">
+  <input
+    id="fuelLbsInput"
+    class="fuel-lbs-input"
+    placeholder="Fuel lbs"
+    inputmode="numeric"
+    autocomplete="off"
+  />
+
+  <input
+    id="fuelGallonInput"
+    class="fuel-gallon-input"
+    placeholder="Fuel gallon"
+    inputmode="numeric"
+    autocomplete="off"
+  />
+</div>
     </div>
 
     <div class="search-area">
@@ -537,18 +566,42 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlbpYcexQE_MQUPIFvYi8PiJGRDjDuIApEO5ERa3EAsbetbLrVaAGKe7VaEDX6SrCTNA/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyX-w3jniuOKGEWft4r4MRIR5J0jx9FYhQB1lhHr81TRps2_jIx-rHEgfi4XeB4IWMRXA/exec";
 
     function searchFuelPrice() {
       const inputEl = document.getElementById("icaoInput");
-      const fuelLbsEl = document.getElementById("fuelLbsInput");
+   
       const statusEl = document.getElementById("status");
       const resultArea = document.getElementById("resultArea");
       const searchBtn = document.getElementById("searchBtn");
 
       const icaoRaw = inputEl.value.trim().toUpperCase();
-      const fuelLbsRaw = fuelLbsEl.value.trim().replace(/,/g, "");
-      const fuelLbs = fuelLbsRaw ? Number(fuelLbsRaw) : 0;
+const fuelLbsEl = document.getElementById("fuelLbsInput");
+const fuelGallonEl = document.getElementById("fuelGallonInput");
+
+const fuelLbsRaw = fuelLbsEl.value.trim().replace(/,/g, "");
+const fuelGallonRaw = fuelGallonEl.value.trim().replace(/,/g, "");
+
+const fuelLbs = fuelLbsRaw ? Number(fuelLbsRaw) : 0;
+const fuelGallon = fuelGallonRaw ? Number(fuelGallonRaw) : 0;
+
+if (fuelLbsRaw && (!Number.isFinite(fuelLbs) || fuelLbs <= 0)) {
+  statusEl.innerHTML =
+    '<span class="error">Fuel lbs 값을 숫자로 입력하세요.</span>';
+  return;
+}
+
+if (fuelGallonRaw && (!Number.isFinite(fuelGallon) || fuelGallon <= 0)) {
+  statusEl.innerHTML =
+    '<span class="error">Fuel gallon 값을 숫자로 입력하세요.</span>';
+  return;
+}
+
+if (fuelLbsRaw && fuelGallonRaw) {
+  statusEl.innerHTML =
+    '<span class="error">Fuel lbs 또는 Fuel gallon 중 하나만 입력하세요.</span>';
+  return;
+}
 
       if (fuelLbsRaw && (!Number.isFinite(fuelLbs) || fuelLbs <= 0)) {
         statusEl.innerHTML =
@@ -616,12 +669,13 @@
         if (oldScript) oldScript.remove();
       };
 
-      script.src =
-        SCRIPT_URL +
-        "?icao=" + encodeURIComponent(icaoList.join(",")) +
-        "&fuelLbs=" + encodeURIComponent(fuelLbs || "") +
-        "&callback=" + encodeURIComponent(callbackName) +
-        "&t=" + Date.now();
+script.src =
+  SCRIPT_URL +
+  "?icao=" + encodeURIComponent(icaoList.join(",")) +
+  "&fuelLbs=" + encodeURIComponent(fuelLbs || "") +
+  "&fuelGallon=" + encodeURIComponent(fuelGallon || "") +
+  "&callback=" + encodeURIComponent(callbackName) +
+  "&t=" + Date.now();
 
       document.body.appendChild(script);
     }
