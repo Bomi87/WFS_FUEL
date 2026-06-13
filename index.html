@@ -808,18 +808,33 @@ function renderAirportSections(rows, icaoList) {
           return;
         }
 
-        const byFbo = groupBy(airportRows, r => r.fbo || "UNKNOWN FBO");
+const validAirportRows = airportRows.filter(r => {
+  const fbo = (r.fbo || "").trim();
+  return fbo && fbo !== "UNKNOWN FBO";
+});
 
-        const fboCards = Object.keys(byFbo).map(fbo => {
-          return renderFboCard(fbo, byFbo[fbo]);
-        }).join("");
+const byFboFuel = groupBy(validAirportRows, r => {
+  const fbo = r.fbo;
+  const fuelType = r.fuelType || "FUEL";
+  return fbo + "|||" + fuelType;
+});
+
+const fboCards = Object.keys(byFboFuel).map(key => {
+  const parts = key.split("|||");
+  const fbo = parts[0];
+  const fuelType = parts[1];
+
+  return renderFboCard(fbo, fuelType, byFboFuel[key]);
+}).join("");
+
+const fboCardsHtml = fboCards || '<div class="empty-box">표시 가능한 FBO 없음</div>';
 
         sections.push(`
           <section class="airport-section">
             <h2 class="airport-title">${escapeHtml(icao)}</h2>
-            <div class="fbo-grid">
-              ${fboCards}
-            </div>
+       <div class="fbo-grid">
+  ${fboCardsHtml}
+</div>
           </section>
         `);
       });
@@ -827,8 +842,7 @@ function renderAirportSections(rows, icaoList) {
   resultArea.innerHTML = fxBanner + sections.join("");
     }
 
-    function renderFboCard(fbo, rows) {
-      const fuelType = getFuelTypeText(rows);
+function renderFboCard(fbo, fuelType, rows) {
 
       const body = rows.map(row => {
         const fromTo = `${escapeHtml(row.scaleFrom || "")} - ${escapeHtml(row.scaleTo || "")}`;
