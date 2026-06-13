@@ -346,6 +346,11 @@ input {
     color: #c5ceda;
     font-weight: 700;
   }
+  .krw-cost {
+  color: #d3ddec;
+  font-weight: 800;
+  margin-left: 4px;
+}
 
   .footer-note {
     margin-top: 12px;
@@ -764,19 +769,21 @@ function renderAirportSections(rows, icaoList) {
         let summaryRow = "";
 
         if (row.totalCostUsd || row.totalCostKrw) {
-          summaryRow = `
-            <tr class="cost-summary-row">
-              <td colspan="2">
-                <div class="cost-summary">
-                  <div>총 비용 USD: ${formatMoneyUsd(row.totalCostUsd)}</div>
-                  <div>총 비용 KRW: ${formatMoneyKrw(row.totalCostKrw)}</div>
-     <small>
-  Fuel: ${formatCeilNumber(row.fuelLbs)} lbs / ${formatCeilNumber(row.fuelUsg)} USG
-</small>
-                </div>
-              </td>
-            </tr>
-          `;
+        summaryRow = `
+  <tr class="cost-summary-row">
+    <td colspan="2">
+      <div class="cost-summary">
+        <div>
+          총 비용: $${formatMoneyUsd(row.totalCostUsd)}
+          <span class="krw-cost">(${formatMoneyKrw(row.totalCostKrw)}원)</span>
+        </div>
+        <small>
+          Fuel: ${formatCeilNumber(row.fuelLbs)} lbs / ${formatCeilNumber(row.fuelUsg)} USG
+        </small>
+      </div>
+    </td>
+  </tr>
+`;
         }
 
         return `
