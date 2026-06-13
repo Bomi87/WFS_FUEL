@@ -527,7 +527,23 @@ input {
 </head>
 
 <body>
-  <div class="page">
+  <div id="authScreen" style="
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:#4e5365;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Noto Sans KR',Arial,sans-serif;
+    color:#ffffff;
+    font-size:15px;
+    font-weight:700;
+  ">
+    승인 확인 중...
+  </div>
+
+  <div id="appRoot" style="display:none;">
+    <div class="page">
     <div class="input-panel">
       <input
         id="icaoInput"
@@ -572,10 +588,42 @@ input {
     <div class="footer-note">
       Price 기준: World Fuel API Total Price / UOM: USG 기준 / Fuel 환산: 1 USG = 6.67 lbs
     </div>
+    </div>
   </div>
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGpFZvCecutOWP4g6i3csb8ik_z_V5K1H31mqSbtouSBUXMNM-YWUntAACutiF0KXo7w/exec";
+    let WORLD_FUEL_APP_STARTED = false;
+
+function showAuthorizedApp() {
+  const authScreen = document.getElementById("authScreen");
+  const appRoot = document.getElementById("appRoot");
+
+  if (authScreen) authScreen.style.display = "none";
+  if (appRoot) appRoot.style.display = "block";
+}
+
+function startWorldFuelAppAfterAuth() {
+  if (WORLD_FUEL_APP_STARTED) return;
+
+  WORLD_FUEL_APP_STARTED = true;
+  showAuthorizedApp();
+}
+
+(function waitForPortalAuth() {
+  if (sessionStorage.getItem("portalApproved") === "true") {
+    startWorldFuelAppAfterAuth();
+    return;
+  }
+
+  if (window.CURRENT_PORTAL_USER) {
+    sessionStorage.setItem("portalApproved", "true");
+    startWorldFuelAppAfterAuth();
+    return;
+  }
+
+  setTimeout(waitForPortalAuth, 200);
+})();
 
     function searchFuelPrice() {
       const inputEl = document.getElementById("icaoInput");
@@ -918,5 +966,7 @@ function formatCeilNumber(value) {
       }
     });
   </script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://bomi87.github.io/SK-Aviation-portal/common-auth.js"></script>
 </body>
 </html>
