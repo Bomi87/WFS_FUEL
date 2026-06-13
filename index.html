@@ -812,11 +812,12 @@ const validAirportRows = airportRows.filter(r => {
   const fbo = (r.fbo || "").trim();
   const fuelType = (r.fuelType || "").trim().toUpperCase();
 
-  return (
-    fbo &&
-    fbo !== "UNKNOWN FBO" &&
-    fuelType !== "AVGAS"
-  );
+return (
+  fbo &&
+  fbo.toUpperCase() !== "UNKNOWN FBO" &&
+  !fuelType.includes("AVGAS") &&
+  !fuelType.includes("AVIATION GASOLINE")
+);
 });
 
 const byFboFuel = groupBy(validAirportRows, r => {
