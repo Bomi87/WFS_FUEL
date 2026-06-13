@@ -775,7 +775,7 @@ function renderAirportSections(rows, icaoList) {
       <div class="cost-summary">
         <div>
        총 비용: $${formatCeilMoneyUsd(row.totalCostUsd)}
-          <span class="krw-cost">(${formatMoneyKrw(row.totalCostKrw)}원)</span>
+       <span class="krw-cost">(${formatCeilKrw100(row.totalCostKrw)}원)</span>
         </div>
         <small>
           Fuel: ${formatCeilNumber(row.fuelLbs)} lbs / ${formatCeilNumber(row.fuelUsg)} USG
@@ -861,7 +861,13 @@ function renderAirportSections(rows, icaoList) {
         maximumFractionDigits: 2
       });
     }
-
+function formatCeilKrw100(value) {
+  if (value === null || value === undefined || value === "") return "";
+  const n = Number(value);
+  if (Number.isNaN(n)) return "";
+  return (Math.ceil(n / 100) * 100).toLocaleString("ko-KR");
+}
+    
     function formatMoneyKrw(value) {
       if (value === null || value === undefined || value === "") return "";
       const n = Number(value);
