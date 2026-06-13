@@ -330,98 +330,126 @@
     }
   }
 
-  @media (max-width: 600px) {
-    .page {
-      width: 100%;
-      max-width: 100%;
-      padding: 12px;
-      overflow-x: hidden;
-    }
-
-    .input-panel {
-      grid-template-columns: minmax(0, 1fr) auto 86px;
-      gap: 6px;
-      width: 100%;
-      max-width: 100%;
-    }
-
-    #icaoInput {
-      width: 100%;
-      min-width: 0;
-    }
-
-    #searchBtn {
-      width: auto;
-      min-width: 48px;
-      height: 34px;
-      padding: 0 9px;
-      font-size: 12px;
-    }
-
-    #fuelLbsInput {
-      width: 86px;
-      min-width: 0;
-      height: 34px;
-      padding: 0 7px;
-      font-size: 12px;
-    }
-
-    .search-area {
-      grid-template-columns: auto minmax(0, 1fr);
-      grid-template-areas:
-        "title airport"
-        "intl corp";
-      gap: 8px 8px;
-    }
-
-    #searchIcaoPill {
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .pill {
-      padding: 7px 12px;
-      font-size: 13px;
-      width: max-content;
-      white-space: nowrap;
-    }
-
-    .search-area .pill:nth-of-type(3) {
-      grid-area: intl;
-      width: max-content;
-      justify-self: start;
-    }
-
-    .search-area .pill:nth-of-type(4) {
-      grid-area: corp;
-      width: max-content;
-      justify-self: start;
-    }
-
-    .airport-section {
-      padding: 12px 10px 14px;
-      margin-bottom: 30px;
-      border-radius: 10px;
-      border-left-width: 8px;
-    }
-
-    .fbo-grid,
-    .fbo-card,
-    .fuel-table {
-      width: 100%;
-      max-width: 100%;
-    }
-
-    .fuel-table {
-      font-size: 12px;
-    }
-
-    .fuel-table td {
-      padding: 12px 8px;
-    }
+@media (max-width: 600px) {
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    position: relative;
   }
+
+  .page {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px;
+    overflow-x: hidden;
+  }
+
+  .input-panel {
+    grid-template-columns: minmax(0, 1fr) auto 72px;
+    gap: 6px;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  #icaoInput {
+    width: 100%;
+    min-width: 0;
+  }
+
+  #searchBtn {
+    width: auto;
+    min-width: 48px;
+    height: 34px;
+    padding: 0 9px;
+    font-size: 12px;
+  }
+
+  #fuelLbsInput {
+    width: 72px;
+    min-width: 0;
+    height: 34px;
+    padding: 0 6px;
+    font-size: 12px;
+  }
+
+  .search-area {
+    width: 100%;
+    max-width: 100%;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "title airport"
+      "intl corp";
+    gap: 8px 8px;
+    overflow: hidden;
+  }
+
+  #searchIcaoPill {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pill {
+    padding: 7px 12px;
+    font-size: 13px;
+    width: max-content;
+    max-width: 100%;
+    white-space: nowrap;
+  }
+
+  .search-area .pill:nth-of-type(3) {
+    grid-area: intl;
+    width: max-content;
+    justify-self: start;
+  }
+
+  .search-area .pill:nth-of-type(4) {
+    grid-area: corp;
+    width: max-content;
+    justify-self: start;
+  }
+
+  .airport-section {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px 10px 14px;
+    margin-bottom: 30px;
+    border-radius: 10px;
+    border-left-width: 8px;
+    overflow: hidden;
+  }
+
+  .fbo-grid {
+    width: 100%;
+    max-width: 100%;
+    grid-template-columns: minmax(0, 1fr);
+    overflow: hidden;
+  }
+
+  .fbo-card {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .fuel-table {
+    width: 100%;
+    min-width: 480px;
+    max-width: none;
+    font-size: 12px;
+  }
+
+  .fuel-table td {
+    padding: 12px 8px;
+  }
+}
 </style>
 
   
