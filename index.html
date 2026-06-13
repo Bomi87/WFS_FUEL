@@ -373,13 +373,17 @@
     overflow-x: hidden;
   }
 
-  .input-panel {
-    grid-template-columns: minmax(0, 1fr) auto 72px;
-    gap: 6px;
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
-  }
+.input-panel {
+  grid-template-columns: minmax(0, 1fr) auto 96px;
+  gap: 6px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.fuel-input-stack {
+  width: 96px;
+}
 
 #icaoInput {
   width: 100%;
@@ -403,7 +407,7 @@
 
 #fuelLbsInput,
 #fuelGallonInput {
-  width: 86px;
+  width: 96px;
   min-width: 0;
   height: 34px;
   padding: 0 7px;
