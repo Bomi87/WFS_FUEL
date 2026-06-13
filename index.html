@@ -106,29 +106,38 @@
     margin-right: 4px;
   }
 
-  .pill {
-    background: #172335;
-    border-radius: 999px;
-    padding: 8px 22px;
-    color: #ffffff;
-    font-size: 13px;
-    font-weight: 700;
-    min-width: 78px;
-    text-align: center;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
-  }
+.pill {
+  background: #172335;
+  border-radius: 999px;
+  padding: 8px 22px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  min-width: 78px;
+  width: max-content;
+  white-space: nowrap;
+  text-align: center;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+#searchIcaoPill {
+  grid-area: airport;
+  max-width: 520px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-  #searchIcaoPill {
-    grid-area: airport;
-  }
+.search-area .pill:nth-of-type(3) {
+  grid-area: intl;
+  width: max-content;
+  justify-self: start;
+}
 
-  .search-area .pill:nth-of-type(2) {
-    grid-area: intl;
-  }
-
-  .search-area .pill:nth-of-type(3) {
-    grid-area: corp;
-  }
+.search-area .pill:nth-of-type(4) {
+  grid-area: corp;
+  width: max-content;
+  justify-self: start;
+}
 
   .status {
     margin-top: 8px;
@@ -148,38 +157,48 @@
     font-weight: 700;
   }
 
-  .airport-section {
-    --section-bg: rgba(19, 29, 42, 0.18);
-    --section-border: rgba(255,255,255,0.08);
-    --card-bg: #1d2838;
-    --card-head-bg: #223244;
-    --card-subhead-bg: #1d2838;
-    --card-summary-bg: #263548;
+.airport-section {
+  --section-bg: rgba(24, 35, 52, 0.58);
+  --section-border: rgba(255,255,255,0.12);
+  --section-accent: rgba(120, 160, 210, 0.95);
 
-    margin-bottom: 34px;
-    padding: 14px 12px 16px;
-    border-radius: 12px;
-    background: var(--section-bg);
-    border: 1px solid var(--section-border);
-  }
+  --card-bg: #1d2838;
+  --card-head-bg: #223244;
+  --card-subhead-bg: #1d2838;
+  --card-summary-bg: #263548;
 
-  .airport-section:nth-of-type(odd) {
-    --section-bg: rgba(18, 27, 40, 0.20);
-    --section-border: rgba(255,255,255,0.08);
-    --card-bg: #1d2838;
-    --card-head-bg: #223244;
-    --card-subhead-bg: #1d2838;
-    --card-summary-bg: #263548;
-  }
+  margin-bottom: 34px;
+  padding: 16px 14px 18px;
+  border-radius: 14px;
+  background: var(--section-bg);
+  border: 1px solid var(--section-border);
+  border-left: 6px solid var(--section-accent);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.035),
+    0 8px 20px rgba(0,0,0,0.10);
+}
 
-  .airport-section:nth-of-type(even) {
-    --section-bg: rgba(35, 45, 62, 0.24);
-    --section-border: rgba(255,255,255,0.10);
-    --card-bg: #243246;
-    --card-head-bg: #2c4258;
-    --card-subhead-bg: #243246;
-    --card-summary-bg: #314257;
-  }
+.airport-section:nth-of-type(odd) {
+  --section-bg: rgba(24, 35, 52, 0.62);
+  --section-border: rgba(145, 175, 210, 0.22);
+  --section-accent: rgba(128, 170, 220, 0.95);
+
+  --card-bg: #1d2838;
+  --card-head-bg: #223244;
+  --card-subhead-bg: #1d2838;
+  --card-summary-bg: #263548;
+}
+
+.airport-section:nth-of-type(even) {
+  --section-bg: rgba(45, 54, 72, 0.72);
+  --section-border: rgba(190, 200, 220, 0.24);
+  --section-accent: rgba(190, 205, 225, 0.95);
+
+  --card-bg: #263448;
+  --card-head-bg: #31475f;
+  --card-subhead-bg: #263448;
+  --card-summary-bg: #34465c;
+}
 
   .airport-title {
     font-size: 18px;
@@ -381,6 +400,19 @@
     .fuel-table td {
       padding: 12px 8px;
     }
+    .search-area .pill:nth-of-type(3),
+.search-area .pill:nth-of-type(4) {
+  width: max-content;
+  justify-self: start;
+}
+
+.search-area .pill:nth-of-type(3) {
+  grid-area: intl;
+}
+
+.search-area .pill:nth-of-type(4) {
+  grid-area: corp;
+}
   }
 </style>
   
