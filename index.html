@@ -810,7 +810,13 @@ function renderAirportSections(rows, icaoList) {
 
 const validAirportRows = airportRows.filter(r => {
   const fbo = (r.fbo || "").trim();
-  return fbo && fbo !== "UNKNOWN FBO";
+  const fuelType = (r.fuelType || "").trim().toUpperCase();
+
+  return (
+    fbo &&
+    fbo !== "UNKNOWN FBO" &&
+    fuelType !== "AVGAS"
+  );
 });
 
 const byFboFuel = groupBy(validAirportRows, r => {
@@ -827,12 +833,12 @@ const fboCards = Object.keys(byFboFuel).map(key => {
   return renderFboCard(fbo, fuelType, byFboFuel[key]);
 }).join("");
 
-const fboCardsHtml = fboCards || '<div class="empty-box">표시 가능한 FBO 없음</div>';
+const fboCardsHtml = fboCards || '<div class="empty-box">표시 가능한 JET A 가격 없음</div>';
 
         sections.push(`
           <section class="airport-section">
             <h2 class="airport-title">${escapeHtml(icao)}</h2>
-       <div class="fbo-grid">
+<div class="fbo-grid">
   ${fboCardsHtml}
 </div>
           </section>
@@ -843,72 +849,62 @@ const fboCardsHtml = fboCards || '<div class="empty-box">표시 가능한 FBO �
     }
 
 function renderFboCard(fbo, fuelType, rows) {
+  const body = rows.map(row => {
+    const fromTo = `${escapeHtml(row.scaleFrom || "")} - ${escapeHtml(row.scaleTo || "")}`;
 
-      const body = rows.map(row => {
-        const fromTo = `${escapeHtml(row.scaleFrom || "")} - ${escapeHtml(row.scaleTo || "")}`;
+    let summaryRow = "";
 
-        let summaryRow = "";
-
-        if (row.totalCostUsd || row.totalCostKrw) {
-        summaryRow = `
-  <tr class="cost-summary-row">
-    <td colspan="2">
-      <div class="cost-summary">
-        <div>
-       총 비용: $${formatCeilMoneyUsd(row.totalCostUsd)}
-       <span class="krw-cost">(${formatCeilKrw100(row.totalCostKrw)}원)</span>
-        </div>
-        <small>
-          Fuel: ${formatCeilNumber(row.fuelLbs)} lbs / ${formatCeilNumber(row.fuelUsg)} USG
-        </small>
-      </div>
-    </td>
-  </tr>
-`;
-        }
-
-        return `
-          <tr>
-            <td>${fromTo}</td>
-            <td>${formatPrice(row.totalPrice)}</td>
-          </tr>
-          ${summaryRow}
-        `;
-      }).join("");
-
-      return `
-        <div class="fbo-card">
-          <div class="fbo-title">${escapeHtml(fbo)}</div>
-          <table class="fuel-table">
-            <thead>
-              <tr>
-                <th colspan="2">${escapeHtml(fuelType)}</th>
-              </tr>
-              <tr>
-                <th>FROM - TO (USG)</th>
-                <th>TOTAL PRICE (USD)</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${body}
-            </tbody>
-          </table>
-        </div>
+    if (row.totalCostUsd || row.totalCostKrw) {
+      summaryRow = `
+        <tr class="cost-summary-row">
+          <td colspan="2">
+            <div class="cost-summary">
+              <div>
+                총 비용: $${formatCeilMoneyUsd(row.totalCostUsd)}
+                <span class="krw-cost">(${formatCeilKrw100(row.totalCostKrw)}원)</span>
+              </div>
+              <small>
+                Fuel: ${formatCeilNumber(row.fuelLbs)} lbs / ${formatCeilNumber(row.fuelUsg)} USG
+              </small>
+            </div>
+          </td>
+        </tr>
       `;
     }
 
-    function getFuelTypeText(rows) {
-      if (!rows || rows.length === 0) return "FUEL";
+    return `
+      <tr>
+        <td>${fromTo}</td>
+        <td>${formatPrice(row.totalPrice)}</td>
+      </tr>
+      ${summaryRow}
+    `;
+  }).join("");
 
-      const types = [...new Set(
-        rows
-          .map(r => r.fuelType || "")
-          .filter(Boolean)
-      )];
+  return `
+    <div class="fbo-card">
+      <div class="fbo-title">${escapeHtml(fbo)}</div>
+      <table class="fuel-table">
+        <thead>
+          <tr>
+            <th colspan="2">${escapeHtml(fuelType)}</th>
+          </tr>
+          <tr>
+            <th>FROM - TO (USG)</th>
+            <th>TOTAL PRICE (USD)</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${body}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
 
-      if (types.length === 0) return "FUEL";
-      return types.join(" / ");
-    }
+
+    
+
 
     function groupBy(array, keyFn) {
       return array.reduce((acc, item) => {
