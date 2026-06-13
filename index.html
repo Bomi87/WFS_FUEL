@@ -422,25 +422,16 @@
       }
 
 
-      renderAirportSections(rows, data.icaoList || icaoList);
+renderAirportSections(rows, data.icaoList || icaoList);
 
-      let statusText =
-        `${(data.icaoList || icaoList).join(", ")} / ${rows.length}개 가격 구간 조회 완료`;
-
-      if (data.generatedAtUtc) {
-        statusText += ` / ${formatUtc(data.generatedAtUtc)}`;
-      }
-
-      if (data.errors && data.errors.length > 0) {
-        statusEl.innerHTML =
-          '<span class="success">' + escapeHtml(statusText) + '</span>' +
-          '<br><span class="error">일부 공항 오류: ' +
-          escapeHtml(formatErrors(data.errors)) +
-          '</span>';
-      } else {
-        statusEl.innerHTML =
-          '<span class="success">' + escapeHtml(statusText) + '</span>';
-      }
+if (data.errors && data.errors.length > 0) {
+  statusEl.innerHTML =
+    '<span class="error">일부 공항 오류: ' +
+    escapeHtml(formatErrors(data.errors)) +
+    '</span>';
+} else {
+  statusEl.textContent = "";
+}
     }
 
 
