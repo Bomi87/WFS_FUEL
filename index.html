@@ -187,7 +187,7 @@
       <div class="input-row">
         <input
           id="icaoInput"
-          placeholder="ICAO 예: KSJC,KBFI,KEWR"
+          placeholder="EX) KSJC KBFI KEWR"
           autocomplete="off"
         />
         <button id="searchBtn" onclick="searchFuelPrice()">조회</button>
@@ -195,7 +195,7 @@
       </div>
 
       <div id="status" class="status">
-        ICAO를 입력하세요. 예: KSJC 또는 KSJC,KBFI,KEWR
+        ICAO를 입력하세요. 예: KSJC 또는 KSJC KBFI KEWR
       </div>
     </div>
 
@@ -229,20 +229,19 @@
     /****************************************************
      * 여기에 Apps Script Web App URL 입력
      ****************************************************/
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxw04d7T-Dhu8VYHK9h41EQA0AQ4IeA_K79jgMQThj6xVS8sxTYI0LfR_LMx7Fy6NaZAA/exec";
-
-    async function searchFuelPrice() {
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwl5Nh9epbR98OTSlvSIRLFZnrwqgcpIamFCwqPpTogXGpnbMeZEfSp2QqPELAYs-eiNw/exec";
+  async function searchFuelPrice() {
       const inputEl = document.getElementById("icaoInput");
       const statusEl = document.getElementById("status");
       const tbody = document.getElementById("resultBody");
       const searchBtn = document.getElementById("searchBtn");
 
-      const icaoRaw = inputEl.value.trim().toUpperCase().replace(/\s+/g, "");
+const icaoRaw = inputEl.value.trim().toUpperCase();
 
-      const icaoList = icaoRaw
-        .split(",")
-        .map(x => x.trim().toUpperCase())
-        .filter(Boolean);
+const icaoList = icaoRaw
+  .split(/[\s,]+/)
+  .map(x => x.trim().toUpperCase())
+  .filter(Boolean);
 
       const invalidList = icaoList.filter(x => !/^[A-Z]{4}$/.test(x));
 
@@ -334,6 +333,7 @@
       }
     }
 
+  
     function clearResult() {
       document.getElementById("icaoInput").value = "";
       document.getElementById("status").textContent =
@@ -350,6 +350,55 @@
       return n.toFixed(5);
     }
 
+
+    function handleFuelPriceResult(data, icaoList) {
+  const statusEl = document.getElementById("status");
+  const tbody = document.getElementById("resultBody");
+
+  if (!data.success && !data.partialSuccess) {
+    throw new Error(data.message || "조회 실패");
+  }
+
+  const rows = data.rows || [];
+
+  if (rows.length === 0) {
+    tbody.innerHTML =
+      '<tr><td colspan="5" class="empty">결과 없음</td></tr>';
+
+    statusEl.textContent =
+      `${icaoList.join(", ")} / 조회 결과 없음`;
+
+    return;
+  }
+
+  tbody.innerHTML = rows.map(row => `
+    <tr>
+      <td>${escapeHtml(row.icao || "")}</td>
+      <td>${escapeHtml(row.fbo || "")}</td>
+      <td>${escapeHtml(row.scaleFrom || "")}</td>
+      <td>${escapeHtml(row.scaleTo || "")}</td>
+      <td>${formatPrice(row.totalPrice)}</td>
+    </tr>
+  `).join("");
+
+  let statusText =
+    `${(data.icaoList || icaoList).join(", ")} / ${rows.length}개 가격 구간 조회 완료`;
+
+  if (data.generatedAtUtc) {
+    statusText += ` / ${formatUtc(data.generatedAtUtc)}`;
+  }
+
+  if (data.errors && data.errors.length > 0) {
+    statusEl.innerHTML =
+      '<span class="success">' + escapeHtml(statusText) + '</span>' +
+      '<br><span class="error">일부 공항 오류: ' +
+      escapeHtml(data.errors.map(e => e.icao + " - " + e.message).join(" / ")) +
+      '</span>';
+  } else {
+    statusEl.innerHTML =
+      '<span class="success">' + escapeHtml(statusText) + '</span>';
+  }
+}
     function formatUtc(isoText) {
       try {
         const d = new Date(isoText);
