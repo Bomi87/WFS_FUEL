@@ -27,37 +27,7 @@
       padding: 18px;
     }
 
-    .top-panel {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-
-.quote-card {
-  min-width: 220px;
-  height: 82px;
-  background: #111926;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 5px 14px rgba(0,0,0,0.35);
-  border-bottom: 2px solid rgba(255, 148, 80, 0.45);
-  padding: 0 24px;
-}
-
-.simple-airport-code {
-  font-size: 36px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  color: #f4f7fb;
-  line-height: 1;
-  text-align: center;
-}
-
-  
+   
 
     .divider {
       height: 1px;
@@ -302,9 +272,9 @@
 <body>
   <div class="page">
 
-    <div id="summaryCards" class="top-panel"></div>
 
-    <div class="divider"></div>
+
+ 
 
     <div class="input-panel">
       <input
@@ -371,7 +341,7 @@
       searchBtn.disabled = true;
       statusEl.textContent = "조회 중...";
       resultArea.innerHTML = '<div class="empty-box">Loading...</div>';
-      document.getElementById("summaryCards").innerHTML = "";
+
       document.getElementById("searchIcaoPill").textContent = icaoList.join(", ");
 
       const callbackName = "wfsCallback_" + Date.now();
@@ -429,11 +399,11 @@
       if (rows.length === 0) {
         resultArea.innerHTML = '<div class="empty-box">결과 없음</div>';
         statusEl.textContent = `${icaoList.join(", ")} / 조회 결과 없음`;
-        renderSummaryCards([], icaoList);
+
         return;
       }
 
-      renderSummaryCards(rows, data.icaoList || icaoList);
+
       renderAirportSections(rows, data.icaoList || icaoList);
 
       let statusText =
@@ -455,17 +425,7 @@
       }
     }
 
-function renderSummaryCards(rows, icaoList) {
-  const summaryCards = document.getElementById("summaryCards");
 
-  const cards = icaoList.map(icao => `
-    <div class="quote-card simple-airport-card">
-      <div class="simple-airport-code">${escapeHtml(icao)}</div>
-    </div>
-  `);
-
-  summaryCards.innerHTML = cards.join("");
-}
 
     function renderAirportSections(rows, icaoList) {
       const resultArea = document.getElementById("resultArea");
@@ -559,7 +519,7 @@ function renderSummaryCards(rows, icaoList) {
         "ICAO를 입력하세요. 예: KEWR PANC KIAD";
       document.getElementById("resultArea").innerHTML =
         '<div class="empty-box">조회 결과 없음</div>';
-      document.getElementById("summaryCards").innerHTML = "";
+
       document.getElementById("searchIcaoPill").textContent = "-";
     }
 
