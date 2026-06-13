@@ -51,22 +51,18 @@
     outline: none;
   }
 
-  input {
-    padding: 0 12px;
-    background: rgba(255,255,255,0.93);
-    color: #111;
-  }
+input {
+  padding: 0 12px;
+  background: rgba(255,255,255,0.93);
+  color: #111;
+}
 
-  #icaoInput {
-    width: 300px;
-    text-transform: uppercase;
-  }
+#icaoInput {
+  width: 300px;
+  text-transform: uppercase;
+}
 
-  #fuelLbsInput {
-    width: 130px;
-    text-transform: none;
-  }
-  .fuel-input-stack {
+.fuel-input-stack {
   display: grid;
   grid-template-columns: 1fr;
   gap: 6px;
@@ -77,6 +73,12 @@
 #fuelGallonInput {
   width: 130px;
   text-transform: none;
+  text-align: center;
+}
+
+#fuelLbsInput::placeholder,
+#fuelGallonInput::placeholder {
+  text-align: center;
 }
 
   button {
