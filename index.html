@@ -438,7 +438,32 @@
     color: #fff;
     font-size: 22px;
   }
+.cost-summary-row td {
+  background: var(--card-summary-bg);
+  color: #ffffff;
+  font-weight: 800;
+  line-height: 1.7;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
 
+.cost-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cost-summary small {
+  color: #d3ddec;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.krw-cost {
+  color: #d3ddec;
+  font-weight: 800;
+  margin-left: 4px;
+}
   .cost-table-body {
     overflow-x: auto;
   }
@@ -1046,51 +1071,93 @@ APP_STATE.canBuildCostTable = canBuildCostTable;
     }
 
     function renderFboCard(icao, fbo, fuelType, rows) {
-      const fboKey = makeFboKey(icao, fbo, fuelType);
-      const isSelected = APP_STATE.selectedFboByIcao[icao] === fboKey;
+  const fboKey = makeFboKey(icao, fbo, fuelType);
+  const isSelected = APP_STATE.selectedFboByIcao[icao] === fboKey;
 
-      const body = rows.map(row => {
-        const fromTo = `${escapeHtml(row.scaleFrom || "")} - ${escapeHtml(row.scaleTo || "")}`;
+  let displayRows = rows;
+  let summaryRow = "";
 
-        return `
-          <tr>
-            <td>${fromTo}</td>
-            <td>${formatPrice(row.totalPrice)}</td>
-          </tr>
-        `;
-      }).join("");
+  if (APP_STATE.canBuildCostTable) {
+    const routeItem = APP_STATE.routeItems.find(item => item.icao === icao);
+    const fuel = routeItem ? getLegFuelAmount(routeItem) : { fuelLbs: 0, fuelUsg: 0 };
 
-      return `
-        <div class="fbo-card">
-          <div class="fbo-title">
-            <span>${escapeHtml(fbo)}</span>
-<button
-  class="select-fbo-btn ${isSelected ? "selected" : ""}"
-  data-key="${escapeHtml(fboKey)}"
-  onclick="selectFboByKey(this.dataset.key)"
-  ${APP_STATE.canBuildCostTable ? "" : "disabled"}
->
-  ${isSelected ? "선택됨" : "선택"}
-</button>
-          </div>
+    const matchedRow = findMatchingFuelRow(rows, fuel.fuelUsg);
 
-          <table class="fuel-table">
-            <thead>
-              <tr>
-                <th colspan="2">${escapeHtml(fuelType)}</th>
-              </tr>
-              <tr>
-                <th>FROM - TO (USG)</th>
-                <th>TOTAL PRICE (USD)</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${body}
-            </tbody>
-          </table>
-        </div>
+    displayRows = matchedRow ? [matchedRow] : [];
+
+    if (matchedRow && fuel.fuelUsg > 0) {
+      const fuelPrice = Number(matchedRow.totalPrice);
+      const totalUsd = Math.ceil(fuel.fuelUsg * fuelPrice);
+      const rate = APP_STATE.usdKrwRate || 0;
+      const totalKrw = rate ? Math.ceil((totalUsd * rate) / 100) * 100 : 0;
+
+      summaryRow = `
+        <tr class="cost-summary-row">
+          <td colspan="2">
+            <div class="cost-summary">
+              <div>
+                총 비용: $${totalUsd.toLocaleString("en-US")}
+                <span class="krw-cost">(${totalKrw ? totalKrw.toLocaleString("ko-KR") : "-"}원)</span>
+              </div>
+              <small>
+                Fuel: ${formatCeilNumber(fuel.fuelLbs)} lbs / ${formatCeilNumber(fuel.fuelUsg)} USG
+              </small>
+            </div>
+          </td>
+        </tr>
       `;
     }
+  }
+
+  const body = displayRows.map(row => {
+    const fromTo = `${escapeHtml(row.scaleFrom || "")} - ${escapeHtml(row.scaleTo || "")}`;
+
+    return `
+      <tr>
+        <td>${fromTo}</td>
+        <td>${formatPrice(row.totalPrice)}</td>
+      </tr>
+    `;
+  }).join("");
+
+  const emptyBody = `
+    <tr>
+      <td colspan="2">해당 연료량에 맞는 가격 구간 없음</td>
+    </tr>
+  `;
+
+  return `
+    <div class="fbo-card">
+      <div class="fbo-title">
+        <span>${escapeHtml(fbo)}</span>
+        <button
+          class="select-fbo-btn ${isSelected ? "selected" : ""}"
+          data-key="${escapeHtml(fboKey)}"
+          onclick="selectFboByKey(this.dataset.key)"
+          ${APP_STATE.canBuildCostTable ? "" : "disabled"}
+        >
+          ${isSelected ? "선택됨" : "선택"}
+        </button>
+      </div>
+
+      <table class="fuel-table">
+        <thead>
+          <tr>
+            <th colspan="2">${escapeHtml(fuelType)}</th>
+          </tr>
+          <tr>
+            <th>FROM - TO (USG)</th>
+            <th>TOTAL PRICE (USD)</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${body || emptyBody}
+          ${summaryRow}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
 
     function parseRouteFuelInput(raw) {
       const tokens = raw
