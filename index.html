@@ -832,42 +832,84 @@
     }
   }
 
-  @media print {
-    body * {
-      visibility: hidden;
-    }
-
-    #costModal,
-    #costModal * {
-      visibility: visible;
-    }
-
-    #costModal {
-      display: block !important;
-      position: absolute;
-      inset: 0;
-      background: #ffffff;
-      padding: 0;
-    }
-
-    .modal-box {
-      margin: 0;
-      max-width: none;
-      box-shadow: none;
-      border-radius: 0;
-    }
-
-    .modal-actions,
-    .modal-close-btn {
-      display: none !important;
-    }
-
-    .cost-report-table {
-      min-width: 0;
-      table-layout: fixed;
-      font-size: 11px;
-    }
+@media print {
+  html,
+  body {
+    width: 100%;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: #ffffff !important;
   }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  #costModal,
+  #costModal * {
+    visibility: visible !important;
+  }
+
+  #costModal {
+    display: block !important;
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+  }
+
+  .modal-box {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  .modal-header {
+    margin-bottom: 8px !important;
+  }
+
+  .modal-header h2 {
+    font-size: 17px !important;
+  }
+
+  .cost-table-body {
+    overflow: visible !important;
+  }
+
+  .modal-actions,
+  .modal-close-btn {
+    display: none !important;
+  }
+
+  .cost-report-note {
+    margin-bottom: 6px !important;
+    font-size: 11px !important;
+  }
+
+  .cost-report-table {
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+    font-size: 10px !important;
+    page-break-inside: avoid !important;
+  }
+
+  .cost-report-table th,
+  .cost-report-table td {
+    padding: 5px 4px !important;
+    line-height: 1.2 !important;
+  }
+}
 </style>
   
 </head>
