@@ -854,7 +854,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGpFZvCecutOWP4g6i3csb8ik_z_V5K1H31mqSbtouSBUXMNM-YWUntAACutiF0KXo7w/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz25EDbJ7-D1RQL6EFyW81_QbFycycgjTmK-T9TIxhT6sO0V8ZtSFAj42w_baGJDa59BQ/exec";
 
     const LBS_PER_USG = 6.67;
     const HOME_AIRPORT = "RKSS";
@@ -1006,13 +1006,14 @@ APP_STATE.canBuildCostTable = canBuildCostTable;
         if (oldScript) oldScript.remove();
       };
 
-      script.src =
-        SCRIPT_URL +
-        "?icao=" + encodeURIComponent(queryIcaoList.join(",")) +
-        "&fuelLbs=" +
-        "&fuelGallon=" +
-        "&callback=" + encodeURIComponent(callbackName) +
-        "&t=" + Date.now();
+script.src =
+  SCRIPT_URL +
+  "?icao=" + encodeURIComponent(queryIcaoList.join(",")) +
+  "&fuelLbs=" +
+  "&fuelGallon=" +
+  "&needFx=1" +
+  "&callback=" + encodeURIComponent(callbackName) +
+  "&t=" + Date.now();
 
       document.body.appendChild(script);
     }
@@ -1348,6 +1349,7 @@ function getUsdKrwRateFromData(data, rows) {
     data && data.exchangeRate,
     data && data.fxRate,
     data && data.rate,
+    data && data.fxInfo && data.fxInfo.rate,
     getUsdKrwRateFromRows(rows)
   ];
 
@@ -1360,7 +1362,6 @@ function getUsdKrwRateFromData(data, rows) {
 
   return 0;
 }
-
 function getUsdKrwRateFromRows(rows) {
   if (!rows || rows.length === 0) return 0;
 
