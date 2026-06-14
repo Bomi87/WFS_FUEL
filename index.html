@@ -1071,7 +1071,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz25EDbJ7-D1RQL6EFyW81_QbFycycgjTmK-T9TIxhT6sO0V8ZtSFAj42w_baGJDa59BQ/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyDUP0M2ixTlRVpRZez0hYGvAyG9RDqmmgb8bAubvD1UtZtmeptgn2msiTlNPYf9clm/exec";
 
     const LBS_PER_USG = 6.67;
     const HOME_AIRPORT = "RKSS";
@@ -1239,7 +1239,7 @@ script.src =
   "?icao=" + encodeURIComponent(queryIcaoList.join(",")) +
   "&fuelLbs=" +
   "&fuelGallon=" +
-  "&needFx=1" +
+  "&needFx=" + (APP_STATE.canBuildCostTable ? "1" : "0") +
   "&callback=" + encodeURIComponent(callbackName) +
   "&t=" + Date.now();
 
