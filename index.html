@@ -1578,11 +1578,14 @@ function getUsdKrwRateFromRows(rows) {
             <td>${escapeHtml(dep)}</td>
             <td>${escapeHtml(arr)}</td>
             <td>
-              <input
-                class="flt-time-input"
-                type="text"
-                placeholder="HH:MM"
-              />
+           <input
+  class="flt-time-input"
+  type="text"
+  placeholder="HH:MM"
+  maxlength="5"
+  inputmode="numeric"
+  oninput="formatFltTimeInput(this)"
+/>
             </td>
             <td>${formatCeilNumber(fuel.fuelLbs)}</td>
             <td>${formatCeilNumber(fuel.fuelUsg)}</td>
@@ -1627,6 +1630,32 @@ function getUsdKrwRateFromRows(rows) {
       `;
     }
 
+
+    function formatFltTimeInput(input) {
+  let value = input.value.replace(/[^0-9:]/g, "");
+
+  if (value.includes(":")) {
+    const parts = value.split(":");
+    let hh = (parts[0] || "").replace(/\D/g, "").slice(0, 2);
+    let mm = (parts[1] || "").replace(/\D/g, "").slice(0, 2);
+
+    input.value = mm ? `${hh}:${mm}` : hh;
+    return;
+  }
+
+  const digits = value.replace(/\D/g, "").slice(0, 4);
+
+  if (digits.length <= 2) {
+    input.value = digits;
+    return;
+  }
+
+  const hh = digits.slice(0, 2);
+  const mm = digits.slice(2, 4);
+
+  input.value = `${hh}:${mm}`;
+}
+    
     function groupBy(array, keyFn) {
       return array.reduce((acc, item) => {
         const key = keyFn(item);
