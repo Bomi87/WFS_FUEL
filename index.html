@@ -1578,24 +1578,25 @@ APP_STATE.usdKrwRate = getUsdKrwRateFromData(data, rows);
       };
     }
 
-    function ensureReturnToHome(routeItems) {
-      const items = routeItems.slice();
+function ensureReturnToHome(routeItems) {
+  const items = routeItems.slice();
 
-      if (items.length === 0) return items;
+  if (items.length === 0) return items;
 
-      const last = items[items.length - 1];
+  const last = items[items.length - 1];
 
-      if (last.icao !== HOME_AIRPORT) {
-        items.push({
-          icao: HOME_AIRPORT,
-          amount: null,
-          autoReturn: true
-        });
-      }
+  // 연료량이 있는 단일 공항 조회도 LEG 계산이 가능하도록 RKSS를 붙임
+  // 예: RKSS 1000 → RKSS 1000 RKSS
+  if (items.length === 1 || last.icao !== HOME_AIRPORT) {
+    items.push({
+      icao: HOME_AIRPORT,
+      amount: null,
+      autoReturn: true
+    });
+  }
 
-      return items;
-    }
-
+  return items;
+}
 
     function hasFuelAmountForAllLegs(routeItems) {
   if (!routeItems || routeItems.length < 2) return false;
