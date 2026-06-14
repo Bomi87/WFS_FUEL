@@ -430,6 +430,18 @@
     font-weight: 700;
   }
 
+  .cost-report-table .krw-total-row td:first-child {
+  border: none;
+  background: transparent;
+}
+
+.cost-report-table .krw-total-cell {
+  color: red;
+  font-weight: 900;
+  border: 1px solid #000;
+  background: #ffffff;
+}
+
   .empty-box {
     background: rgba(17, 25, 38, 0.65);
     border-radius: 8px;
@@ -641,11 +653,10 @@
     color: red;
   }
 
-  .cost-report-table .krw-total-label,
-  .cost-report-table .krw-total-cell {
-    color: red;
-    font-weight: 900;
-  }
+.cost-report-table .krw-total-cell {
+  color: red;
+  font-weight: 900;
+}
 
   @media (max-width: 900px) {
     .fbo-grid {
@@ -1584,12 +1595,12 @@ function getUsdKrwRateFromRows(rows) {
           </thead>
           <tbody>
             ${rowsHtml.join("")}
-            <tr>
-              <td colspan="8" class="krw-total-label">SUM</td>
-              <td class="krw-total-cell">
-                ${totalKrwSum ? "₩" + totalKrwSum.toLocaleString("ko-KR") : "-"}
-              </td>
-            </tr>
+     <tr class="krw-total-row">
+  <td colspan="8"></td>
+  <td class="krw-total-cell">
+    ${totalKrwSum ? "₩" + totalKrwSum.toLocaleString("ko-KR") : "-"}
+  </td>
+</tr>
           </tbody>
         </table>
       `;
