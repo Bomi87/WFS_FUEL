@@ -1174,7 +1174,71 @@ APP_STATE.usdKrwRate = getUsdKrwRateFromData(data, rows);
       const fxBanner = fxRate
         ? `<div class="fx-banner">USD/KRW 환율: <span>${formatNumber(fxRate)}</span></div>`
         : "";
+if (!APP_STATE.canBuildCostTable) {
+  const icaoList = [...new Set(
+    routeItems
+      .map(item => item.icao)
+      .filter(Boolean)
+  )];
 
+  icaoList.forEach(icao => {
+    const airportRows = byIcao[icao] || [];
+
+    if (airportRows.length === 0) {
+      sections.push(`
+        <section class="airport-section">
+          <h2 class="airport-title">${escapeHtml(icao)}</h2>
+          <div class="empty-box">해당 공항 가격 정보 없음</div>
+        </section>
+      `);
+      return;
+    }
+
+    const validAirportRows = airportRows.filter(r => {
+      const fbo = (r.fbo || "").trim();
+      const fuelType = (r.fuelType || "").trim().toUpperCase();
+
+      return (
+        fbo &&
+        fbo.toUpperCase() !== "UNKNOWN FBO" &&
+        !fuelType.includes("AVGAS") &&
+        !fuelType.includes("AVIATION GASOLINE")
+      );
+    });
+
+    const byFboFuel = groupBy(validAirportRows, r => {
+      const fbo = r.fbo;
+      const fuelType = r.fuelType || "FUEL";
+      return fbo + "|||" + fuelType;
+    });
+
+    const fboCards = Object.keys(byFboFuel).map(key => {
+      const parts = key.split("|||");
+      const fbo = parts[0];
+      const fuelType = parts[1];
+
+      const fboKey = makeFboKey("AIRPORT", icao, fbo, fuelType);
+      APP_STATE.fboRowsByKey[fboKey] = byFboFuel[key];
+
+      return renderFboCard("AIRPORT", icao, fbo, fuelType, byFboFuel[key], null);
+    }).join("");
+
+    const fboCardsHtml = fboCards || '<div class="empty-box">표시 가능한 JET A 가격 없음</div>';
+
+    sections.push(`
+      <section class="airport-section">
+        <h2 class="airport-title">${escapeHtml(icao)}</h2>
+        <div class="fbo-grid">
+          ${fboCardsHtml}
+        </div>
+      </section>
+    `);
+  });
+
+  resultArea.innerHTML = fxBanner + sections.join("");
+  return;
+}
+      
       const sections = [];
       const legItems = routeItems.slice(0, -1);
 
