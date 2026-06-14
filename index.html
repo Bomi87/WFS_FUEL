@@ -919,7 +919,7 @@
 
       <div class="cost-table-action">
         <button id="routeCostBtn" onclick="openCostTableModal()" disabled>
-          금액 테이블
+          FILE 만들기
         </button>
       </div>
 
@@ -1515,7 +1515,7 @@ function getUsdKrwRateFromRows(rows) {
       const rate = APP_STATE.usdKrwRate || 0;
 
       if (routeItems.length < 2) {
-        return '<div class="empty-box">금액 테이블을 만들 수 없습니다.</div>';
+        return '<div class="empty-box">FILE 만들기를 할 수 없습니다.</div>';
       }
 
       const rowsHtml = [];
