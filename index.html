@@ -540,7 +540,7 @@
 
   .cost-report-table .krw-cell {
     color: red;
-    font-weight: 800;
+    font-weight: 400;
   }
 
   .cost-report-note {
@@ -548,19 +548,6 @@
     margin-bottom: 8px;
     font-size: 12px;
     font-weight: 700;
-  }
-
-  .flt-time-input {
-    width: 74px;
-    height: 28px;
-    padding: 0 6px;
-    border: 1px solid #777;
-    border-radius: 0;
-    background: #ffffff;
-    color: #000000;
-    font-size: 13px !important;
-    text-align: center;
-    box-shadow: none;
   }
 
   .modal-actions {
@@ -573,6 +560,51 @@
   .modal-actions button {
     height: 36px;
     font-size: 13px;
+  }
+
+
+
+  @page {
+    size: A4 landscape;
+    margin: 12mm;
+  }
+
+  .flt-time-input {
+    width: 100%;
+    height: auto;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    color: #000000;
+    font-size: inherit !important;
+    font-family: inherit;
+    line-height: inherit;
+    text-align: center;
+    box-shadow: none;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .cost-report-table .fuel-price-cell {
+    color: #005bbb;
+    font-weight: 700;
+  }
+
+  .cost-report-table .total-usd-cell,
+  .cost-report-table .krw-cell {
+    font-weight: 400;
+  }
+
+  .cost-report-table .krw-cell {
+    color: red;
+  }
+
+  .cost-report-table .krw-total-label,
+  .cost-report-table .krw-total-cell {
+    color: red;
+    font-weight: 900;
   }
 
   @media (max-width: 900px) {
@@ -1434,6 +1466,7 @@ function getUsdKrwRateFromRows(rows) {
       }
 
       const rowsHtml = [];
+      let totalKrwSum = 0;
 
       for (let i = 0; i < routeItems.length - 1; i++) {
         const depItem = routeItems[i];
@@ -1456,8 +1489,12 @@ function getUsdKrwRateFromRows(rows) {
           const totalUsd = Math.ceil(fuel.fuelUsg * fuelPrice);
           const totalKrw = rate ? Math.ceil((totalUsd * rate) / 100) * 100 : 0;
 
+          if (totalKrw) {
+            totalKrwSum += totalKrw;
+          }
+
           fuelPriceText = formatPrice2(fuelPrice);
-          totalUsdText = "US$" + totalUsd.toLocaleString("en-US");
+          totalUsdText = "$" + totalUsd.toLocaleString("en-US");
           totalKrwText = rate ? "₩" + totalKrw.toLocaleString("ko-KR") : "-";
         }
 
@@ -1475,8 +1512,8 @@ function getUsdKrwRateFromRows(rows) {
             </td>
             <td>${formatCeilNumber(fuel.fuelLbs)}</td>
             <td>${formatCeilNumber(fuel.fuelUsg)}</td>
-            <td>${fuelPriceText}</td>
-            <td>${totalUsdText}</td>
+            <td class="fuel-price-cell">${fuelPriceText}</td>
+            <td class="total-usd-cell">${totalUsdText}</td>
             <td class="krw-cell">${totalKrwText}</td>
           </tr>
         `);
@@ -1493,18 +1530,24 @@ function getUsdKrwRateFromRows(rows) {
           <thead>
             <tr>
               <th>Leg</th>
-              <th>DEP APO</th>
-              <th>ARR APO</th>
+              <th>DEP<br>APO</th>
+              <th>ARR<br>APO</th>
               <th>FLT TIME</th>
-              <th>Refueling (LBS)</th>
-              <th>Refueling (USG)</th>
-              <th>Fuel Price (USD/USG)</th>
-              <th>Total Price (USD)</th>
-              <th>Total Price (KRW)</th>
+              <th>Refueling<br>(LBS)</th>
+              <th>Refueling<br>(USG)</th>
+              <th>Fuel Price<br>(USD/USG)</th>
+              <th>Total Price<br>(USD)</th>
+              <th>Total Price<br>(KRW)</th>
             </tr>
           </thead>
           <tbody>
             ${rowsHtml.join("")}
+            <tr>
+              <td colspan="8" class="krw-total-label">TOTAL KRW</td>
+              <td class="krw-total-cell">
+                ${totalKrwSum ? "₩" + totalKrwSum.toLocaleString("ko-KR") : "-"}
+              </td>
+            </tr>
           </tbody>
         </table>
       `;
