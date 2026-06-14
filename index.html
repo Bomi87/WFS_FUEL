@@ -500,6 +500,18 @@
     color: #fff;
     font-size: 22px;
   }
+
+  .airport-title {
+  font-weight: 500;
+}
+
+.airport-title .dep-bold {
+  font-weight: 900;
+}
+
+.airport-title .arr-normal {
+  font-weight: 500;
+}
 .cost-summary-row td {
   background: var(--card-summary-bg);
   color: #ffffff;
@@ -1176,7 +1188,11 @@ APP_STATE.usdKrwRate = getUsdKrwRateFromData(data, rows);
         if (airportRows.length === 0) {
           sections.push(`
             <section class="airport-section">
-             <h2 class="airport-title">LEG ${index + 1} ${escapeHtml(icao)} → (${escapeHtml(arr)})</h2>
+             <h2 class="airport-title">
+  LEG ${index + 1}
+  <span class="dep-bold">${escapeHtml(icao)}</span>
+  <span class="arr-normal">→ (${escapeHtml(arr)})</span>
+</h2>
               <div class="empty-box">해당 공항 가격 정보 없음</div>
             </section>
           `);
@@ -1216,7 +1232,11 @@ APP_STATE.usdKrwRate = getUsdKrwRateFromData(data, rows);
 
         sections.push(`
           <section class="airport-section">
-            <h2 class="airport-title">LEG ${index + 1} ${escapeHtml(icao)} → (${escapeHtml(arr)})</h2>
+         <h2 class="airport-title">
+  LEG ${index + 1}
+  <span class="dep-bold">${escapeHtml(icao)}</span>
+  <span class="arr-normal">→ (${escapeHtml(arr)})</span>
+</h2>
             <div class="fbo-grid">
               ${fboCardsHtml}
             </div>
