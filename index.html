@@ -550,6 +550,19 @@
     font-weight: 700;
   }
 
+  .flt-time-input {
+    width: 74px;
+    height: 28px;
+    padding: 0 6px;
+    border: 1px solid #777;
+    border-radius: 0;
+    background: #ffffff;
+    color: #000000;
+    font-size: 13px !important;
+    text-align: center;
+    box-shadow: none;
+  }
+
   .modal-actions {
     display: flex;
     justify-content: flex-end;
@@ -1434,24 +1447,16 @@ function getUsdKrwRateFromRows(rows) {
         const selectedRows = selectedKey ? APP_STATE.fboRowsByKey[selectedKey] : null;
         const matchedRow = findMatchingFuelRow(selectedRows, fuel.fuelUsg);
 
-        let fboName = "-";
         let fuelPriceText = "-";
         let totalUsdText = "-";
         let totalKrwText = "-";
-
-        if (selectedKey) {
-          const parts = selectedKey.split("|||");
-          fboName = parts[1] || "-";
-        } else {
-          fboName = "FBO 미선택";
-        }
 
         if (matchedRow && fuel.fuelUsg > 0) {
           const fuelPrice = Number(matchedRow.totalPrice);
           const totalUsd = Math.ceil(fuel.fuelUsg * fuelPrice);
           const totalKrw = rate ? Math.ceil((totalUsd * rate) / 100) * 100 : 0;
 
-          fuelPriceText = formatPrice(fuelPrice);
+          fuelPriceText = formatPrice2(fuelPrice);
           totalUsdText = "US$" + totalUsd.toLocaleString("en-US");
           totalKrwText = rate ? "₩" + totalKrw.toLocaleString("ko-KR") : "-";
         }
@@ -1461,9 +1466,15 @@ function getUsdKrwRateFromRows(rows) {
             <td>${i + 1}</td>
             <td>${escapeHtml(dep)}</td>
             <td>${escapeHtml(arr)}</td>
+            <td>
+              <input
+                class="flt-time-input"
+                type="text"
+                placeholder="HH:MM"
+              />
+            </td>
             <td>${formatCeilNumber(fuel.fuelLbs)}</td>
             <td>${formatCeilNumber(fuel.fuelUsg)}</td>
-            <td>${escapeHtml(fboName)}</td>
             <td>${fuelPriceText}</td>
             <td>${totalUsdText}</td>
             <td class="krw-cell">${totalKrwText}</td>
@@ -1484,9 +1495,9 @@ function getUsdKrwRateFromRows(rows) {
               <th>Leg</th>
               <th>DEP APO</th>
               <th>ARR APO</th>
+              <th>FLT TIME</th>
               <th>Refueling (LBS)</th>
               <th>Refueling (USG)</th>
-              <th>Selected FBO</th>
               <th>Fuel Price (USD/USG)</th>
               <th>Total Price (USD)</th>
               <th>Total Price (KRW)</th>
@@ -1513,6 +1524,13 @@ function getUsdKrwRateFromRows(rows) {
       const n = Number(value);
       if (Number.isNaN(n)) return escapeHtml(value);
       return n.toFixed(5);
+    }
+
+    function formatPrice2(value) {
+      if (value === null || value === undefined || value === "") return "";
+      const n = Number(value);
+      if (Number.isNaN(n)) return escapeHtml(value);
+      return n.toFixed(2);
     }
 
     function formatCeilMoneyUsd(value) {
