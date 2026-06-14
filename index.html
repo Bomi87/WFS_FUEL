@@ -1217,16 +1217,29 @@ APP_STATE.usdKrwRate = getUsdKrwRateFromData(data, rows);
             return fbo + "|||" + fuelType;
           });
 
-          const fboCards = Object.keys(byFboFuel).map(key => {
-            const parts = key.split("|||");
-            const fbo = parts[0];
-            const fuelType = parts[1];
+  const fboFuelKeys = Object.keys(byFboFuel);
 
-            const fboKey = makeFboKey("AIRPORT", icao, fbo, fuelType);
-            APP_STATE.fboRowsByKey[fboKey] = byFboFuel[key];
+if (APP_STATE.canBuildCostTable && fboFuelKeys.length === 1) {
+  const onlyKey = fboFuelKeys[0];
+  const parts = onlyKey.split("|||");
+  const fbo = parts[0];
+  const fuelType = parts[1];
 
-            return renderFboCard("AIRPORT", icao, fbo, fuelType, byFboFuel[key], null);
-          }).join("");
+  const autoFboKey = makeFboKey(legKey, icao, fbo, fuelType);
+
+  APP_STATE.selectedFboByIcao[legKey] = autoFboKey;
+}
+
+const fboCards = fboFuelKeys.map(key => {
+  const parts = key.split("|||");
+  const fbo = parts[0];
+  const fuelType = parts[1];
+
+  const fboKey = makeFboKey(legKey, icao, fbo, fuelType);
+  APP_STATE.fboRowsByKey[fboKey] = byFboFuel[key];
+
+  return renderFboCard(legKey, icao, fbo, fuelType, byFboFuel[key], routeItem);
+}).join("");
 
           const fboCardsHtml = fboCards || '<div class="empty-box">표시 가능한 JET A 가격 없음</div>';
 
