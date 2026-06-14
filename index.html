@@ -1089,8 +1089,10 @@ APP_STATE.canBuildCostTable = canBuildCostTable;
       statusEl.textContent = "조회 중...";
       resultArea.innerHTML = '<div class="empty-box">Loading...</div>';
 
-      document.getElementById("searchIcaoPill").textContent =
-        routeItems.map(item => item.icao).join(" - ");
+  document.getElementById("searchIcaoPill").textContent =
+  APP_STATE.canBuildCostTable
+    ? routeItems.map(item => item.icao).join(" - ")
+    : routeItems.map(item => item.icao).join(", ");
 
       const callbackName = "wfsCallback_" + Date.now();
 
