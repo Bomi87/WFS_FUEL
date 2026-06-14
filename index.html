@@ -896,19 +896,57 @@
     font-size: 11px !important;
   }
 
-  .cost-report-table {
-    width: 100% !important;
-    min-width: 0 !important;
-    table-layout: fixed !important;
-    font-size: 10px !important;
-    page-break-inside: avoid !important;
-  }
+.cost-report-table {
+  width: 100% !important;
+  min-width: 0 !important;
+  table-layout: fixed !important;
+  font-size: 13px !important;
+  color: #000 !important;
+  border-collapse: collapse !important;
+  page-break-inside: avoid !important;
+}
 
-  .cost-report-table th,
-  .cost-report-table td {
-    padding: 5px 4px !important;
-    line-height: 1.2 !important;
-  }
+.cost-report-table th,
+.cost-report-table td {
+  border: 1px solid #000 !important;
+  padding: 9px 8px !important;
+  line-height: 1.25 !important;
+  text-align: center !important;
+  font-family: Arial, "Noto Sans KR", sans-serif !important;
+}
+
+.cost-report-table th {
+  background: #bfbfbf !important;
+  color: #000 !important;
+  font-weight: 800 !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+  .cost-report-table .fuel-price-cell {
+  color: #005bbb !important;
+  font-weight: 700 !important;
+}
+
+.cost-report-table .total-usd-cell {
+  color: #000 !important;
+  font-weight: 400 !important;
+}
+
+.cost-report-table .krw-cell,
+.cost-report-table .krw-total-cell {
+  color: red !important;
+}
+
+.cost-report-table .krw-total-cell {
+  font-weight: 900 !important;
+  border: 1px solid #000 !important;
+  background: #ffffff !important;
+}
+
+.cost-report-note {
+  color: #000 !important;
+  font-weight: 700 !important;
+}
 }
 </style>
   
