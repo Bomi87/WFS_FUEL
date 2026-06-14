@@ -1548,12 +1548,12 @@ function getUsdKrwRateFromRows(rows) {
       });
     }
 
-    function formatCeilNumber(value) {
-      if (value === null || value === undefined || value === "") return "";
-      const n = Number(value);
-      if (Number.isNaN(n)) return "";
-      return Math.ceil(n).toLocaleString("en-US");
-    }
+   function formatCeilNumber(value) {
+  if (value === null || value === undefined || value === "") return "";
+  const n = Number(value);
+  if (Number.isNaN(n)) return "";
+  return Math.round(n).toLocaleString("en-US");
+}
 
     function formatNumber(value) {
       if (value === null || value === undefined || value === "") return "";
