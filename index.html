@@ -1029,7 +1029,7 @@ APP_STATE.canBuildCostTable = canBuildCostTable;
       const rows = data.rows || [];
       APP_STATE.rows = rows;
 
-APP_STATE.usdKrwRate = getUsdKrwRateFromRows(rows);
+APP_STATE.usdKrwRate = getUsdKrwRateFromData(data, rows);
 
       if (rows.length === 0) {
         resultArea.innerHTML = '<div class="empty-box">결과 없음</div>';
@@ -1058,8 +1058,7 @@ APP_STATE.usdKrwRate = getUsdKrwRateFromRows(rows);
 
       APP_STATE.fboRowsByKey = {};
 
- const fxRate = getUsdKrwRateFromRows(rows);
-APP_STATE.usdKrwRate = fxRate;
+const fxRate = APP_STATE.usdKrwRate || getUsdKrwRateFromRows(rows);
 
 const fxBanner = fxRate
   ? `<div class="fx-banner">USD/KRW 환율: <span>${formatNumber(fxRate)}</span></div>`
@@ -1343,14 +1342,52 @@ const fxBanner = fxRate
         return fuelUsg >= scaleFrom && fuelUsg <= scaleTo;
       }) || null;
     }
+function getUsdKrwRateFromData(data, rows) {
+  const candidates = [
+    data && data.usdKrwRate,
+    data && data.exchangeRate,
+    data && data.fxRate,
+    data && data.rate,
+    getUsdKrwRateFromRows(rows)
+  ];
+
+  for (const value of candidates) {
+    const rate = parseNumber(value);
+    if (Number.isFinite(rate) && rate > 0) {
+      return rate;
+    }
+  }
+
+  return 0;
+}
+
 function getUsdKrwRateFromRows(rows) {
-  const fxRow = rows.find(r => r.usdKrwRate);
+  if (!rows || rows.length === 0) return 0;
 
-  if (!fxRow || !fxRow.usdKrwRate) return 0;
+  const fxRow = rows.find(r =>
+    r.usdKrwRate ||
+    r.exchangeRate ||
+    r.fxRate ||
+    r.rate
+  );
 
-  const rate = parseNumber(fxRow.usdKrwRate);
+  if (!fxRow) return 0;
 
-  return Number.isFinite(rate) ? rate : 0;
+  const candidates = [
+    fxRow.usdKrwRate,
+    fxRow.exchangeRate,
+    fxRow.fxRate,
+    fxRow.rate
+  ];
+
+  for (const value of candidates) {
+    const rate = parseNumber(value);
+    if (Number.isFinite(rate) && rate > 0) {
+      return rate;
+    }
+  }
+
+  return 0;
 }
     function parseNumber(value) {
       if (value === null || value === undefined || value === "") return NaN;
