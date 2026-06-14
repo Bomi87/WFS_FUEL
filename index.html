@@ -919,7 +919,7 @@
 
       <div class="cost-table-action">
         <button id="routeCostBtn" onclick="openCostTableModal()" disabled>
-          FILE 생성
+          PDF
         </button>
       </div>
 
@@ -1515,7 +1515,7 @@ function getUsdKrwRateFromRows(rows) {
       const rate = APP_STATE.usdKrwRate || 0;
 
       if (routeItems.length < 2) {
-        return '<div class="empty-box">FILE 생성을 할 수 없습니다.</div>';
+        return '<div class="empty-box">PDF를 생성할 수 없습니다.</div>';
       }
 
       const rowsHtml = [];
