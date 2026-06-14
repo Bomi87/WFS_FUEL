@@ -1637,25 +1637,11 @@ function getUsdKrwRateFromRows(rows) {
         const fuel = getLegFuelAmount(depItem);
         const legKey = "LEG" + (i + 1);
 
-        let selectedKey = APP_STATE.selectedFboByIcao[legKey];
-        let selectedRows = selectedKey ? APP_STATE.fboRowsByKey[selectedKey] : null;
-        let matchedRow = findMatchingFuelRow(selectedRows, fuel.fuelUsg);
-
-        if (!matchedRow) {
-          const fallbackKey = Object.keys(APP_STATE.fboRowsByKey).find(key => {
-            const parts = key.split("|||");
-            const keyLeg = parts[0];
-            const rows = APP_STATE.fboRowsByKey[key];
-
-            return keyLeg === legKey && findMatchingFuelRow(rows, fuel.fuelUsg);
-          });
-
-          if (fallbackKey) {
-            selectedKey = fallbackKey;
-            selectedRows = APP_STATE.fboRowsByKey[fallbackKey];
-            matchedRow = findMatchingFuelRow(selectedRows, fuel.fuelUsg);
-          }
-        }
+const selectedKey = APP_STATE.selectedFboByIcao[legKey];
+const selectedRows = selectedKey ? APP_STATE.fboRowsByKey[selectedKey] : null;
+const matchedRow = selectedRows
+  ? findMatchingFuelRow(selectedRows, fuel.fuelUsg)
+  : null;
 
         let fuelPriceText = "-";
         let totalUsdText = "-";
