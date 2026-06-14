@@ -1075,7 +1075,7 @@ APP_STATE.canBuildCostTable = canBuildCostTable;
 
       window[callbackName] = function (data) {
         try {
-          handleFuelPriceResult(data, queryIcaoList);
+          handleFuelPriceResult(data, routeItems);
         } catch (err) {
           resultArea.innerHTML = '<div class="empty-box">조회 실패</div>';
           statusEl.innerHTML =
@@ -1116,7 +1116,7 @@ script.src =
       document.body.appendChild(script);
     }
 
-    function handleFuelPriceResult(data, icaoList) {
+    function handleFuelPriceResult(data, routeItems) {
       const statusEl = document.getElementById("status");
       const resultArea = document.getElementById("resultArea");
       const routeCostBtn = document.getElementById("routeCostBtn");
@@ -1137,7 +1137,7 @@ APP_STATE.usdKrwRate = getUsdKrwRateFromData(data, rows);
         return;
       }
 
-      renderAirportSections(rows, icaoList);
+      renderAirportSections(rows, routeItems);
 
     if (routeCostBtn) routeCostBtn.disabled = !APP_STATE.canBuildCostTable;
 
@@ -1151,27 +1151,32 @@ APP_STATE.usdKrwRate = getUsdKrwRateFromData(data, rows);
       }
     }
 
-    function renderAirportSections(rows, icaoList) {
+    function renderAirportSections(rows, routeItems) {
       const resultArea = document.getElementById("resultArea");
       const byIcao = groupBy(rows, r => r.icao || "");
 
       APP_STATE.fboRowsByKey = {};
 
-const fxRate = APP_STATE.usdKrwRate || getUsdKrwRateFromRows(rows);
+      const fxRate = APP_STATE.usdKrwRate || getUsdKrwRateFromRows(rows);
 
-const fxBanner = fxRate
-  ? `<div class="fx-banner">USD/KRW 환율: <span>${formatNumber(fxRate)}</span></div>`
-  : "";
+      const fxBanner = fxRate
+        ? `<div class="fx-banner">USD/KRW 환율: <span>${formatNumber(fxRate)}</span></div>`
+        : "";
 
       const sections = [];
+      const legItems = routeItems.slice(0, -1);
 
-      icaoList.forEach(icao => {
+      legItems.forEach((routeItem, index) => {
+        const icao = routeItem.icao;
+        const arr = routeItems[index + 1] ? routeItems[index + 1].icao : "";
+        const legKey = "LEG" + (index + 1);
+
         const airportRows = byIcao[icao] || [];
 
         if (airportRows.length === 0) {
           sections.push(`
             <section class="airport-section">
-              <h2 class="airport-title">${escapeHtml(icao)}</h2>
+              <h2 class="airport-title">LEG ${index + 1} ${escapeHtml(icao)} → ${escapeHtml(arr)}</h2>
               <div class="empty-box">해당 공항 가격 정보 없음</div>
             </section>
           `);
@@ -1201,17 +1206,17 @@ const fxBanner = fxRate
           const fbo = parts[0];
           const fuelType = parts[1];
 
-          const fboKey = makeFboKey(icao, fbo, fuelType);
+          const fboKey = makeFboKey(legKey, icao, fbo, fuelType);
           APP_STATE.fboRowsByKey[fboKey] = byFboFuel[key];
 
-          return renderFboCard(icao, fbo, fuelType, byFboFuel[key]);
+          return renderFboCard(legKey, icao, fbo, fuelType, byFboFuel[key], routeItem);
         }).join("");
 
         const fboCardsHtml = fboCards || '<div class="empty-box">표시 가능한 JET A 가격 없음</div>';
 
         sections.push(`
           <section class="airport-section">
-            <h2 class="airport-title">${escapeHtml(icao)}</h2>
+            <h2 class="airport-title">LEG ${index + 1} ${escapeHtml(icao)} → ${escapeHtml(arr)}</h2>
             <div class="fbo-grid">
               ${fboCardsHtml}
             </div>
@@ -1222,95 +1227,93 @@ const fxBanner = fxRate
       resultArea.innerHTML = fxBanner + sections.join("");
     }
 
-    function renderFboCard(icao, fbo, fuelType, rows) {
-  const fboKey = makeFboKey(icao, fbo, fuelType);
-  const isSelected = APP_STATE.selectedFboByIcao[icao] === fboKey;
+    function renderFboCard(legKey, icao, fbo, fuelType, rows, routeItem) {
+      const fboKey = makeFboKey(legKey, icao, fbo, fuelType);
+      const isSelected = APP_STATE.selectedFboByIcao[legKey] === fboKey;
 
-  let displayRows = rows;
-  let summaryRow = "";
+      let displayRows = rows;
+      let summaryRow = "";
 
-  if (APP_STATE.canBuildCostTable) {
-    const routeItem = APP_STATE.routeItems.find(item => item.icao === icao);
-    const fuel = routeItem ? getLegFuelAmount(routeItem) : { fuelLbs: 0, fuelUsg: 0 };
+      if (APP_STATE.canBuildCostTable) {
+        const fuel = routeItem ? getLegFuelAmount(routeItem) : { fuelLbs: 0, fuelUsg: 0 };
+        const matchedRow = findMatchingFuelRow(rows, fuel.fuelUsg);
 
-    const matchedRow = findMatchingFuelRow(rows, fuel.fuelUsg);
+        displayRows = matchedRow ? [matchedRow] : [];
 
-    displayRows = matchedRow ? [matchedRow] : [];
+        if (matchedRow && fuel.fuelUsg > 0) {
+          const fuelPrice = Number(matchedRow.totalPrice);
+          const totalUsd = Math.ceil(fuel.fuelUsg * fuelPrice);
+          const rate = APP_STATE.usdKrwRate || 0;
+          const totalKrw = rate ? Math.ceil((totalUsd * rate) / 100) * 100 : 0;
 
-    if (matchedRow && fuel.fuelUsg > 0) {
-      const fuelPrice = Number(matchedRow.totalPrice);
-      const totalUsd = Math.ceil(fuel.fuelUsg * fuelPrice);
-      const rate = APP_STATE.usdKrwRate || 0;
-      const totalKrw = rate ? Math.ceil((totalUsd * rate) / 100) * 100 : 0;
+          summaryRow = `
+            <tr class="cost-summary-row">
+              <td colspan="2">
+                <div class="cost-summary">
+                  <div>
+                    총 비용: $${totalUsd.toLocaleString("en-US")}
+                    <span class="krw-cost">(${totalKrw ? totalKrw.toLocaleString("ko-KR") : "-"}원)</span>
+                  </div>
+                  <small>
+                    Fuel: ${formatCeilNumber(fuel.fuelLbs)} lbs / ${formatCeilNumber(fuel.fuelUsg)} USG
+                  </small>
+                </div>
+              </td>
+            </tr>
+          `;
+        }
+      }
 
-      summaryRow = `
-        <tr class="cost-summary-row">
-          <td colspan="2">
-            <div class="cost-summary">
-              <div>
-                총 비용: $${totalUsd.toLocaleString("en-US")}
-                <span class="krw-cost">(${totalKrw ? totalKrw.toLocaleString("ko-KR") : "-"}원)</span>
-              </div>
-              <small>
-                Fuel: ${formatCeilNumber(fuel.fuelLbs)} lbs / ${formatCeilNumber(fuel.fuelUsg)} USG
-              </small>
-            </div>
-          </td>
+      const body = displayRows.map(row => {
+        const fromTo = `${escapeHtml(row.scaleFrom || "")} - ${escapeHtml(row.scaleTo || "")}`;
+
+        return `
+          <tr>
+            <td>${fromTo}</td>
+            <td>${formatPrice(row.totalPrice)}</td>
+          </tr>
+        `;
+      }).join("");
+
+      const emptyBody = `
+        <tr>
+          <td colspan="2">해당 연료량에 맞는 가격 구간 없음</td>
         </tr>
       `;
+
+      return `
+        <div class="fbo-card">
+          <div class="fbo-title">
+            <span>${escapeHtml(fbo)}</span>
+            <button
+              class="select-fbo-btn ${isSelected ? "selected" : ""}"
+              data-key="${escapeHtml(fboKey)}"
+              onclick="selectFboByKey(this.dataset.key)"
+              ${APP_STATE.canBuildCostTable ? "" : "disabled"}
+              title="${isSelected ? "선택됨" : "선택"}"
+            >
+              <span class="check-box"></span>
+            </button>
+          </div>
+
+          <table class="fuel-table">
+            <thead>
+              <tr>
+                <th colspan="2">${escapeHtml(fuelType)}</th>
+              </tr>
+              <tr>
+                <th>FROM - TO (USG)</th>
+                <th>FUEL PRICE (USD/USG)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${body || emptyBody}
+              ${summaryRow}
+            </tbody>
+          </table>
+        </div>
+      `;
     }
-  }
-
-  const body = displayRows.map(row => {
-    const fromTo = `${escapeHtml(row.scaleFrom || "")} - ${escapeHtml(row.scaleTo || "")}`;
-
-    return `
-      <tr>
-        <td>${fromTo}</td>
-        <td>${formatPrice(row.totalPrice)}</td>
-      </tr>
-    `;
-  }).join("");
-
-  const emptyBody = `
-    <tr>
-      <td colspan="2">해당 연료량에 맞는 가격 구간 없음</td>
-    </tr>
-  `;
-
-  return `
-    <div class="fbo-card">
-      <div class="fbo-title">
-        <span>${escapeHtml(fbo)}</span>
- <button
-  class="select-fbo-btn ${isSelected ? "selected" : ""}"
-  data-key="${escapeHtml(fboKey)}"
-  onclick="selectFboByKey(this.dataset.key)"
-  ${APP_STATE.canBuildCostTable ? "" : "disabled"}
-  title="${isSelected ? "선택됨" : "선택"}"
->
-  <span class="check-box"></span>
-</button>
-      </div>
-
-      <table class="fuel-table">
-        <thead>
-          <tr>
-            <th colspan="2">${escapeHtml(fuelType)}</th>
-          </tr>
-          <tr>
-            <th>FROM - TO (USG)</th>
-            <th>FUEL PRICE (USD/USG)</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${body || emptyBody}
-          ${summaryRow}
-        </tbody>
-      </table>
-    </div>
-  `;
-}
 
     function parseRouteFuelInput(raw) {
       const tokens = raw
@@ -1382,31 +1385,31 @@ const fxBanner = fxRate
   });
 }
     
-    function makeFboKey(icao, fbo, fuelType) {
-      return [icao, fbo, fuelType].join("|||");
+    function makeFboKey(legKey, icao, fbo, fuelType) {
+      return [legKey, icao, fbo, fuelType].join("|||");
     }
 
-  function selectFboByKey(key) {
-  if (!APP_STATE.canBuildCostTable) return;
+    function selectFboByKey(key) {
+      if (!APP_STATE.canBuildCostTable) return;
 
-  const parts = key.split("|||");
-  const icao = parts[0];
+      const parts = key.split("|||");
+      const legKey = parts[0];
 
-  APP_STATE.selectedFboByIcao[icao] = key;
+      APP_STATE.selectedFboByIcao[legKey] = key;
 
-  refreshSelectedFboButtons();
-}
+      refreshSelectedFboButtons();
+    }
 
     function refreshSelectedFboButtons() {
       document.querySelectorAll(".select-fbo-btn").forEach(btn => {
         const key = btn.dataset.key || "";
         const parts = key.split("|||");
-        const icao = parts[0];
+        const legKey = parts[0];
 
-        const selected = APP_STATE.selectedFboByIcao[icao] === key;
+        const selected = APP_STATE.selectedFboByIcao[legKey] === key;
 
         btn.classList.toggle("selected", selected);
-      btn.title = selected ? "선택됨" : "선택";
+        btn.title = selected ? "선택됨" : "선택";
       });
     }
 
@@ -1529,9 +1532,27 @@ function getUsdKrwRateFromRows(rows) {
         const arr = arrItem.icao;
 
         const fuel = getLegFuelAmount(depItem);
-        const selectedKey = APP_STATE.selectedFboByIcao[dep];
-        const selectedRows = selectedKey ? APP_STATE.fboRowsByKey[selectedKey] : null;
-        const matchedRow = findMatchingFuelRow(selectedRows, fuel.fuelUsg);
+        const legKey = "LEG" + (i + 1);
+
+        let selectedKey = APP_STATE.selectedFboByIcao[legKey];
+        let selectedRows = selectedKey ? APP_STATE.fboRowsByKey[selectedKey] : null;
+        let matchedRow = findMatchingFuelRow(selectedRows, fuel.fuelUsg);
+
+        if (!matchedRow) {
+          const fallbackKey = Object.keys(APP_STATE.fboRowsByKey).find(key => {
+            const parts = key.split("|||");
+            const keyLeg = parts[0];
+            const rows = APP_STATE.fboRowsByKey[key];
+
+            return keyLeg === legKey && findMatchingFuelRow(rows, fuel.fuelUsg);
+          });
+
+          if (fallbackKey) {
+            selectedKey = fallbackKey;
+            selectedRows = APP_STATE.fboRowsByKey[fallbackKey];
+            matchedRow = findMatchingFuelRow(selectedRows, fuel.fuelUsg);
+          }
+        }
 
         let fuelPriceText = "-";
         let totalUsdText = "-";
