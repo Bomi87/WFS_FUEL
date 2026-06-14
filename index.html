@@ -82,23 +82,47 @@
     width: 130px;
   }
 
-  .unit-btn {
-    width: 130px;
-    height: 40px;
-    padding: 0;
-    border-radius: 6px;
-    background: rgba(255,255,255,0.93);
-    color: #333;
-    font-size: 14px;
-    font-weight: 800;
-    box-shadow: none;
-  }
+.unit-btn {
+  width: 130px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.93);
+  color: #333;
+  font-size: 14px;
+  font-weight: 800;
+  box-shadow: none;
 
-  .unit-btn.selected {
-    background: #111926;
-    color: #ffffff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.unit-btn.selected {
+  background: #111926;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+.check-box {
+  width: 15px;
+  height: 15px;
+  border: 2px solid currentColor;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.unit-btn.selected .check-box::after,
+.select-fbo-btn.selected .check-box::after {
+  content: "✓";
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+}
 
   button {
     padding: 0 22px;
@@ -110,9 +134,25 @@
     white-space: nowrap;
   }
 
-  button:hover {
-    background: #1a2638;
-  }
+ .unit-btn:hover {
+  background: rgba(255,255,255,0.93);
+  color: #333;
+}
+
+.unit-btn.selected:hover {
+  background: #111926;
+  color: #ffffff;
+}
+
+.select-fbo-btn:hover {
+  background: transparent;
+  color: #00d7ff;
+}
+
+.select-fbo-btn.selected:hover {
+  background: #00c8f0;
+  color: #00111a;
+}
 
   button:disabled {
     opacity: 0.55;
@@ -289,21 +329,31 @@
     gap: 8px;
   }
 
-  .select-fbo-btn {
-    height: 26px;
-    padding: 0 10px;
-    font-size: 11px;
-    border-radius: 999px;
-    background: transparent;
-    border: 1px solid #00c8f0;
-    color: #00d7ff;
-    box-shadow: none;
-  }
+.select-fbo-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid #00c8f0;
+  color: #00d7ff;
+  box-shadow: none;
 
-  .select-fbo-btn.selected {
-    background: #00c8f0;
-    color: #00111a;
-  }
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.select-fbo-btn .check-box {
+  width: 15px;
+  height: 15px;
+}
+
+.select-fbo-btn.selected {
+  background: #00c8f0;
+  color: #00111a;
+}
+
 .select-fbo-btn:disabled {
   opacity: 0.35;
   cursor: not-allowed;
@@ -568,12 +618,13 @@
       gap: 5px;
     }
 
-    .unit-btn {
-      width: 86px;
-      height: 34px;
-      padding: 0;
-      font-size: 12px;
-    }
+.unit-btn {
+  width: 86px;
+  height: 34px;
+  padding: 0 8px;
+  font-size: 12px;
+  gap: 6px;
+}
 
     .search-area {
       width: 100%;
@@ -738,25 +789,27 @@
 
         <button id="searchBtn" onclick="searchFuelPrice()">조회</button>
 
-        <div class="fuel-unit-toggle">
-          <button
-            type="button"
-            id="unitLbsBtn"
-            class="unit-btn selected"
-            onclick="setFuelUnit('LBS')"
-          >
-            LBS
-          </button>
+      <div class="fuel-unit-toggle">
+  <button
+    type="button"
+    id="unitLbsBtn"
+    class="unit-btn selected"
+    onclick="setFuelUnit('LBS')"
+  >
+    <span class="check-box"></span>
+    <span>LBS</span>
+  </button>
 
-          <button
-            type="button"
-            id="unitUsgBtn"
-            class="unit-btn"
-            onclick="setFuelUnit('USG')"
-          >
-            USG
-          </button>
-        </div>
+  <button
+    type="button"
+    id="unitUsgBtn"
+    class="unit-btn"
+    onclick="setFuelUnit('USG')"
+  >
+    <span class="check-box"></span>
+    <span>USG</span>
+  </button>
+</div>
       </div>
 
       <div class="search-area">
@@ -1130,14 +1183,15 @@ APP_STATE.canBuildCostTable = canBuildCostTable;
     <div class="fbo-card">
       <div class="fbo-title">
         <span>${escapeHtml(fbo)}</span>
-        <button
-          class="select-fbo-btn ${isSelected ? "selected" : ""}"
-          data-key="${escapeHtml(fboKey)}"
-          onclick="selectFboByKey(this.dataset.key)"
-          ${APP_STATE.canBuildCostTable ? "" : "disabled"}
-        >
-          ${isSelected ? "선택됨" : "선택"}
-        </button>
+ <button
+  class="select-fbo-btn ${isSelected ? "selected" : ""}"
+  data-key="${escapeHtml(fboKey)}"
+  onclick="selectFboByKey(this.dataset.key)"
+  ${APP_STATE.canBuildCostTable ? "" : "disabled"}
+  title="${isSelected ? "선택됨" : "선택"}"
+>
+  <span class="check-box"></span>
+</button>
       </div>
 
       <table class="fuel-table">
@@ -1253,7 +1307,7 @@ APP_STATE.canBuildCostTable = canBuildCostTable;
         const selected = APP_STATE.selectedFboByIcao[icao] === key;
 
         btn.classList.toggle("selected", selected);
-        btn.textContent = selected ? "선택됨" : "선택";
+      btn.title = selected ? "선택됨" : "선택";
       });
     }
 
