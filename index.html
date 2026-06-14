@@ -1190,7 +1190,9 @@ APP_STATE.usdKrwRate = getUsdKrwRateFromData(data, rows);
           if (airportRows.length === 0) {
             sections.push(`
               <section class="airport-section">
-                <h2 class="airport-title">${escapeHtml(icao)}</h2>
+               <h2 class="airport-title">
+  <span class="dep-bold">${escapeHtml(icao)}</span>
+</h2>
                 <div class="empty-box">해당 공항 가격 정보 없음</div>
               </section>
             `);
@@ -1230,7 +1232,9 @@ APP_STATE.usdKrwRate = getUsdKrwRateFromData(data, rows);
 
           sections.push(`
             <section class="airport-section">
-              <h2 class="airport-title">${escapeHtml(icao)}</h2>
+            <h2 class="airport-title">
+  <span class="dep-bold">${escapeHtml(icao)}</span>
+</h2>
               <div class="fbo-grid">
                 ${fboCardsHtml}
               </div>
