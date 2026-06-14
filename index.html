@@ -304,7 +304,12 @@
     background: #00c8f0;
     color: #00111a;
   }
-
+.select-fbo-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  border-color: rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.45);
+}
   .fuel-table {
     width: 100%;
     max-width: 620px;
@@ -778,15 +783,16 @@
 
     let WORLD_FUEL_APP_STARTED = false;
 
-    const APP_STATE = {
-      rows: [],
-      routeItems: [],
-      queryIcaoList: [],
-      fuelUnit: "LBS",
-      selectedFboByIcao: {},
-      fboRowsByKey: {},
-      usdKrwRate: 0
-    };
+  const APP_STATE = {
+  rows: [],
+  routeItems: [],
+  queryIcaoList: [],
+  fuelUnit: "LBS",
+  selectedFboByIcao: {},
+  fboRowsByKey: {},
+  usdKrwRate: 0,
+  canBuildCostTable: false
+};
 
     function showAuthorizedApp() {
       const authScreen = document.getElementById("authScreen");
@@ -862,6 +868,8 @@
         return;
       }
 
+      const canBuildCostTable = hasFuelAmountForAllLegs(routeItems);
+
       const queryIcaoList = [...new Set(
         routeItems
           .slice(0, -1)
@@ -869,13 +877,14 @@
           .filter(Boolean)
       )];
 
-      APP_STATE.rows = [];
-      APP_STATE.routeItems = routeItems;
-      APP_STATE.queryIcaoList = queryIcaoList;
-      APP_STATE.fuelUnit = fuelUnit;
-      APP_STATE.selectedFboByIcao = {};
-      APP_STATE.fboRowsByKey = {};
-      APP_STATE.usdKrwRate = 0;
+APP_STATE.rows = [];
+APP_STATE.routeItems = routeItems;
+APP_STATE.queryIcaoList = queryIcaoList;
+APP_STATE.fuelUnit = fuelUnit;
+APP_STATE.selectedFboByIcao = {};
+APP_STATE.fboRowsByKey = {};
+APP_STATE.usdKrwRate = 0;
+APP_STATE.canBuildCostTable = canBuildCostTable;
 
       if (routeCostBtn) routeCostBtn.disabled = true;
 
@@ -954,7 +963,7 @@
 
       renderAirportSections(rows, icaoList);
 
-      if (routeCostBtn) routeCostBtn.disabled = false;
+    if (routeCostBtn) routeCostBtn.disabled = !APP_STATE.canBuildCostTable;
 
       if (data.errors && data.errors.length > 0) {
         statusEl.innerHTML =
@@ -1055,13 +1064,14 @@
         <div class="fbo-card">
           <div class="fbo-title">
             <span>${escapeHtml(fbo)}</span>
-            <button
-              class="select-fbo-btn ${isSelected ? "selected" : ""}"
-              data-key="${escapeHtml(fboKey)}"
-              onclick="selectFboByKey(this.dataset.key)"
-            >
-              ${isSelected ? "선택됨" : "선택"}
-            </button>
+<button
+  class="select-fbo-btn ${isSelected ? "selected" : ""}"
+  data-key="${escapeHtml(fboKey)}"
+  onclick="selectFboByKey(this.dataset.key)"
+  ${APP_STATE.canBuildCostTable ? "" : "disabled"}
+>
+  ${isSelected ? "선택됨" : "선택"}
+</button>
           </div>
 
           <table class="fuel-table">
@@ -1143,18 +1153,29 @@
       return items;
     }
 
+
+    function hasFuelAmountForAllLegs(routeItems) {
+  if (!routeItems || routeItems.length < 2) return false;
+
+  return routeItems.slice(0, -1).every(item => {
+    return Number.isFinite(Number(item.amount)) && Number(item.amount) > 0;
+  });
+}
+    
     function makeFboKey(icao, fbo, fuelType) {
       return [icao, fbo, fuelType].join("|||");
     }
 
-    function selectFboByKey(key) {
-      const parts = key.split("|||");
-      const icao = parts[0];
+  function selectFboByKey(key) {
+  if (!APP_STATE.canBuildCostTable) return;
 
-      APP_STATE.selectedFboByIcao[icao] = key;
+  const parts = key.split("|||");
+  const icao = parts[0];
 
-      refreshSelectedFboButtons();
-    }
+  APP_STATE.selectedFboByIcao[icao] = key;
+
+  refreshSelectedFboButtons();
+}
 
     function refreshSelectedFboButtons() {
       document.querySelectorAll(".select-fbo-btn").forEach(btn => {
