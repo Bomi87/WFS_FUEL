@@ -522,8 +522,48 @@
     width: 100%;
     min-width: 980px;
     border-collapse: collapse;
+    table-layout: fixed;
     font-size: 13px;
     color: #000;
+  }
+
+  .cost-report-table th:nth-child(1),
+  .cost-report-table td:nth-child(1) {
+    width: 5%;
+  }
+
+  .cost-report-table th:nth-child(2),
+  .cost-report-table td:nth-child(2),
+  .cost-report-table th:nth-child(3),
+  .cost-report-table td:nth-child(3) {
+    width: 7%;
+  }
+
+  .cost-report-table th:nth-child(4),
+  .cost-report-table td:nth-child(4) {
+    width: 8%;
+  }
+
+  .cost-report-table th:nth-child(5),
+  .cost-report-table td:nth-child(5),
+  .cost-report-table th:nth-child(6),
+  .cost-report-table td:nth-child(6) {
+    width: 11%;
+  }
+
+  .cost-report-table th:nth-child(7),
+  .cost-report-table td:nth-child(7) {
+    width: 13%;
+  }
+
+  .cost-report-table th:nth-child(8),
+  .cost-report-table td:nth-child(8) {
+    width: 13%;
+  }
+
+  .cost-report-table th:nth-child(9),
+  .cost-report-table td:nth-child(9) {
+    width: 25%;
   }
 
   .cost-report-table th,
@@ -801,10 +841,12 @@
 
     .cost-report-table {
       min-width: 0;
+      table-layout: fixed;
       font-size: 11px;
     }
   }
 </style>
+  
 </head>
 
 <body>
@@ -1543,7 +1585,7 @@ function getUsdKrwRateFromRows(rows) {
           <tbody>
             ${rowsHtml.join("")}
             <tr>
-              <td colspan="8" class="krw-total-label">TOTAL KRW</td>
+              <td colspan="8" class="krw-total-label">SUM</td>
               <td class="krw-total-cell">
                 ${totalKrwSum ? "₩" + totalKrwSum.toLocaleString("ko-KR") : "-"}
               </td>
