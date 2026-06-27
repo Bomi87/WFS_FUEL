@@ -1105,13 +1105,7 @@
     }
 
     (function waitForPortalAuth() {
-      if (sessionStorage.getItem("portalApproved") === "true") {
-        startWorldFuelAppAfterAuth();
-        return;
-      }
-
       if (window.CURRENT_PORTAL_USER) {
-        sessionStorage.setItem("portalApproved", "true");
         startWorldFuelAppAfterAuth();
         return;
       }
